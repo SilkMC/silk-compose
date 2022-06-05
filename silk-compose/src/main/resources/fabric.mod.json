@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "silk-compose",
+  "version": "${version}",
+  "name": "Silk Compose",
+  "description": "${description}",
+  "authors": [
+    "Jakob K"
+  ],
+  "mixins": [
+    "silk-compose.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*"
+  },
+  "contact": {
+    "homepage": "${githubUrl}",
+    "issues": "https://github.com/SilkMC/silk-compose/issues",
+    "sources": "https://github.com/SilkMC/silk-compose"
+  }
+}
