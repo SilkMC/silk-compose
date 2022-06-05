@@ -14,12 +14,10 @@ repositories {
 
 val includeTransitive: Configuration by configurations.creating {
     exclude(group = "org.jetbrains.kotlin")
-}
+    exclude(group = "com.mojang")
 
-configurations.all {
-    resolutionStrategy.capabilitiesResolution.withCapability("org.jetbrains.skiko:skiko") {
-        select(candidates.single { it.variantName == "awtRuntimeElements-published" })
-        because("use awt skiko")
+    attributes {
+        attribute(Attribute.of("ui", String::class.java), "awt")
     }
 }
 
@@ -43,7 +41,7 @@ dependencies {
 
     includeTransitive(api("com.github.ajalt.colormath:colormath:3.2.0")!!)
 
-    //includeTransitive(api(compose.desktop.common)!!)
+    includeTransitive(api(compose.desktop.common)!!)
     includeTransitive(compose.desktop.linux_x64)
     includeTransitive(compose.desktop.linux_arm64)
     includeTransitive(compose.desktop.windows_x64)
