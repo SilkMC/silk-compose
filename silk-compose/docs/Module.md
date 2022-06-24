@@ -10,7 +10,7 @@ The Compose dependency is bundled with fabrikmc-compose, you don't have to inclu
 ## Usage
 
 You can open a server-side compose gui and show it to a player using
-the [player.displayComposable][net.axay.fabrik.compose.displayComposable] function:
+the [player.displayComposable][net.silkmc.silk.compose.displayComposable] function:
 
 ```kotlin
 player.displayComposable(8, 6) {
@@ -37,18 +37,18 @@ There are docs at [Android Developer Website](https://developer.android.com/jetp
 find desktop specific documentation at the [compose-jb](https://github.com/JetBrains/compose-jb) repository.
 Additionally, there is a  [communtiy maintained playground](https://foso.github.io/Jetpack-Compose-Playground/).
 
-# Package net.axay.fabrik.compose
+# Package net.silkmc.silk.compose
 
 Implementation of Compose scenes for Minecraft
 
-# Package net.axay.fabrik.compose.color
+# Package net.silkmc.silk.compose.color
 
 Color utilities for working with map colors
 
-# Package net.axay.fabrik.compose.icons
+# Package net.silkmc.silk.compose.icons
 
 Contains generated constants for Minecraft icons
 
-# Package net.axay.fabrik.compose.ui
+# Package net.silkmc.silk.compose.ui
 
 UI components (composable functions) useful for Minecraft guis

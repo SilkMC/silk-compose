@@ -22,19 +22,19 @@ val includeTransitive: Configuration by configurations.creating {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.19-rc2")
+    minecraft("com.mojang:minecraft:1.19")
     mappings(loom.layered {
-        addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:1.19-rc2+build.1:v2"))
+        addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:1.19+build.1:v2"))
         officialMojangMappings()
     })
-    modImplementation("net.fabricmc:fabric-loader:0.14.6")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:0.55.0+1.19")
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.7.4+kotlin.1.6.21")
+    modImplementation("net.fabricmc:fabric-loader:0.14.8")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:0.56.3+1.19")
+    modImplementation("net.fabricmc:fabric-language-kotlin:1.8.0+kotlin.1.7.0")
 
     include(api(project(":${rootProject.name}-mojang-api"))!!)
     ksp(project(":${rootProject.name}-ksp"))
 
-    modApi("net.axay:fabrikmc-core:1.8.0")
+    modApi("net.silkmc:silk-core:1.9.0")
 
     includeTransitive(api("org.jetbrains.kotlinx:multik-api:0.1.1")!!)
     includeTransitive(api("org.jetbrains.kotlinx:multik-jvm:0.1.1")!!)
@@ -70,7 +70,7 @@ tasks {
 }
 
 ksp {
-    arg("minecraft-version", "1.18.2")
+    arg("minecraft-version", "1.19")
 }
 
 kotlin {
