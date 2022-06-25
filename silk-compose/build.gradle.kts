@@ -23,6 +23,9 @@ dependencies {
     includeTransitive(api("com.github.ajalt.colormath:colormath:3.2.0")!!)
 
     includeTransitive(api(compose.desktop.common)!!)
+    @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+    includeTransitive(api(compose.material3)!!)
+
     includeTransitive(compose.desktop.linux_x64)
     includeTransitive(compose.desktop.linux_arm64)
     includeTransitive(compose.desktop.windows_x64)
