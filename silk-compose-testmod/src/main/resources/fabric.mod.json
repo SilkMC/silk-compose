@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "silk-compose-testmod",
+  "version": "0.0.1",
+  "name": "Silk Compose Testmod",
+  "description": "A testmod for the Silk Compose module",
+  "authors": [
+    "Jakob K"
+  ],
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "net.silkmc.silk.test.compose.ComposeTestmod"
+      }
+    ]
+  },
+  "depends": {
+    "silk-compose": "*"
+  }
+}

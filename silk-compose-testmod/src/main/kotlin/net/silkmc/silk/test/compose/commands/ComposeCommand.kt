@@ -1,14 +1,14 @@
-package net.silkmc.silk.test.compose
+package net.silkmc.silk.test.compose.commands
 
 import androidx.compose.foundation.layout.Column
+import net.silkmc.silk.commands.command
 import net.silkmc.silk.compose.displayComposable
 import net.silkmc.silk.compose.ui.McWindowHeader
-import net.silkmc.silk.test.commands.testCommand
 import net.silkmc.silk.test.compose.game.FallingBallsGameComposable
-import net.silkmc.silk.test.compose.guis.ScrollTestComposable
 import net.silkmc.silk.test.compose.guis.GeneralTestComposable
+import net.silkmc.silk.test.compose.guis.ScrollTestComposable
 
-val composeCommand = testCommand("compose") {
+val composeCommand = command("compose") {
     literal("general_test") runs {
         source.playerOrException.displayComposable(4, 3) {
             Column {

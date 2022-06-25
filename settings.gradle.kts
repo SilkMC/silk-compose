@@ -4,7 +4,6 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-        google()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.fabricmc.net/")
         maven("https://server.bbkr.space/artifactory/libs-release/")
@@ -15,3 +14,4 @@ pluginManagement {
 include(":${rootProject.name}")
 include(":${rootProject.name}-ksp")
 include(":${rootProject.name}-mojang-api")
+include(":${rootProject.name}-testmod")
