@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(MaterialColor.class)
 public interface MaterialColorAccessor {
+
     @Accessor("MATERIAL_COLORS")
     static MaterialColor[] getMaterialColors() {
         throw new AssertionError();

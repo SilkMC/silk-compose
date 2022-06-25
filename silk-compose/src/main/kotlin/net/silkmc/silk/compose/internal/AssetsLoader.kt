@@ -6,13 +6,13 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.minecraft.SharedConstants
 import net.silkmc.silk.compose.icons.McIcon
 import net.silkmc.silk.compose.mojangapi.LauncherMeta
-import net.silkmc.silk.core.Fabrik
+import net.silkmc.silk.core.Silk
 import net.silkmc.silk.core.logging.logError
 import net.silkmc.silk.core.logging.logInfo
-import net.silkmc.silk.core.task.fabrikCoroutineScope
-import net.minecraft.SharedConstants
+import net.silkmc.silk.core.task.silkCoroutineScope
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -22,13 +22,13 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.pathString
 
 object AssetsLoader {
-    private val assetsStorage = (Fabrik.currentServer?.serverDirectory ?: File(".")).resolve("server-assets/")
+    private val assetsStorage = (Silk.currentServer?.serverDirectory ?: File(".")).resolve("server-assets/")
     private val assetsPath = assetsStorage.toPath().resolve("assets")
 
     private val loadedAssets = CompletableDeferred<Boolean>()
 
     init {
-        fabrikCoroutineScope.launch(Dispatchers.IO) {
+        silkCoroutineScope.launch(Dispatchers.IO) {
             val serverVersion = SharedConstants.getCurrentVersion().name
             val versionFile = assetsStorage.resolve("version.txt")
 

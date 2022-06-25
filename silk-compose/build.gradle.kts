@@ -58,7 +58,15 @@ ksp {
 }
 
 kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    sourceSets {
+        main {
+            kotlin.srcDir("build/generated/ksp/main/kotlin")
+        }
+
+        all {
+            languageSettings {
+                optIn("net.silkmc.silk.core.annotations.DelicateSilkApi")
+            }
+        }
     }
 }

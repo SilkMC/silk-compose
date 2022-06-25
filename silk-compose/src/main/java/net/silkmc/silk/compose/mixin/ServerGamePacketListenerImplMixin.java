@@ -14,9 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {
 
-    @Shadow public ServerPlayer player;
+    @Shadow
+    public ServerPlayer player;
 
-    @Inject(method = "handleAnimate", at = @At("RETURN"))
+    @Inject(
+        method = "handleAnimate",
+        at = @At("RETURN")
+    )
     private void onHandSwingInject(ServerboundSwingPacket packet, CallbackInfo ci) {
         MinecraftComposeGui.Companion.onSwingHand$silk_compose(player, packet);
     }

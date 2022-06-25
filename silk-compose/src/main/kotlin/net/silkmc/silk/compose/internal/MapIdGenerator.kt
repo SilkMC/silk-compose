@@ -4,7 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.silkmc.silk.core.task.fabrikCoroutineScope
+import net.silkmc.silk.core.task.silkCoroutineScope
 
 internal object MapIdGenerator {
     private val mutex = Mutex()
@@ -20,7 +20,7 @@ internal object MapIdGenerator {
     }
 
     fun makeOldIdAvailable(ids: Collection<Int>) {
-        fabrikCoroutineScope.launch {
+        silkCoroutineScope.launch {
             mutex.withLock {
                 availableOldIds.addAll(ids)
             }
