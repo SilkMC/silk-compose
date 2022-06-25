@@ -3,6 +3,7 @@ description = "Silk Compose brings Kotlin compose-jb to Minecraft"
 plugins {
     `mod-build-script`
     `project-publish-script`
+    `mod-upload-script`
     id("com.google.devtools.ksp")
     id("org.jetbrains.compose")
 }
