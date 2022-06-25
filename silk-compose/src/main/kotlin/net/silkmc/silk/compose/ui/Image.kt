@@ -1,6 +1,7 @@
 package net.silkmc.silk.compose.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -43,5 +44,7 @@ fun McImage(
             alignment = alignment,
             contentScale = contentScale
         )
+    } else {
+        Spacer(modifier)
     }
 }
