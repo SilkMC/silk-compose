@@ -1,4 +1,4 @@
-description = "FabrikMC Compose brings Kotlin compose-jb to Minecraft"
+description = "Silk Compose brings Kotlin compose-jb to Minecraft"
 
 plugins {
     `mod-build-script`
