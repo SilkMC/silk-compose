@@ -3,7 +3,6 @@ package net.silkmc.silk.compose.ksp
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.ksp.KotlinPoetKspPreview
 import com.squareup.kotlinpoet.ksp.writeTo
 import net.silkmc.silk.compose.mojangapi.LauncherMeta
 import java.nio.file.FileSystems
@@ -24,7 +23,7 @@ class MinecraftResourceGenerator(
     private val codeGenerator: CodeGenerator,
     private val version: String,
 ) : SymbolProcessor {
-    var invoked = false
+    private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (invoked) return emptyList()
@@ -52,7 +51,6 @@ class MinecraftResourceGenerator(
 
         val mcIconType = TypeVariableName("McIcon")
 
-        @OptIn(KotlinPoetKspPreview::class)
         FileSpec.builder(packageName, fileName)
             .addFileComment("this file has been generated based on the client jar file of Minecraft $version")
             .addTypeAlias(TypeAliasSpec.builder("McIcon", String::class).build())

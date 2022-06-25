@@ -331,6 +331,7 @@ class MinecraftComposeGui(
         return Offset((planeX * 128).toFloat(), (planeY * 128).toFloat())
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun onLeftClick() = launch {
         val offset = calculateOffset() ?: return@launch
 
