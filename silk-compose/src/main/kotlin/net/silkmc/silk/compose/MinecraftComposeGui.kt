@@ -12,12 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.dp
 import com.github.ajalt.colormath.model.SRGB
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
-import net.silkmc.silk.compose.color.MaterialColorUtils
-import net.silkmc.silk.compose.internal.MapIdGenerator
-import net.silkmc.silk.core.logging.logError
+import kotlinx.coroutines.*
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.core.BlockPos
@@ -30,6 +25,10 @@ import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData
 import net.minecraft.world.phys.Vec3
+import net.silkmc.silk.compose.color.MaterialColorUtils
+import net.silkmc.silk.compose.internal.MapIdGenerator
+import net.silkmc.silk.core.logging.logError
+import net.silkmc.silk.core.task.silkCoroutineScope
 import org.jetbrains.kotlinx.multik.api.linalg.dot
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
@@ -90,7 +89,7 @@ class MinecraftComposeGui(
                 playerGuis.clear()
             }
 
-            ServerPlayConnectionEvents.DISCONNECT.register { handler, server ->
+            ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
                 playerGuis[handler.player.uuid]?.close()
             }
         }
@@ -362,9 +361,18 @@ class MinecraftComposeGui(
      */
     fun close() {
         player.connection.send(ClientboundRemoveEntitiesPacket(*itemFrameEntityIds.toIntArray()))
-        MapIdGenerator.makeOldIdAvailable(guiChunks.map { it.mapId })
-        coroutineContext.close()
-        scene.close()
         playerGuis.remove(player.uuid, this)
+        MapIdGenerator.makeOldIdAvailable(guiChunks.map { it.mapId })
+
+        val guiContext = coroutineContext
+
+        silkCoroutineScope.launch {
+            withContext(guiContext) {
+                frameDispatcher.cancel()
+                scene.close()
+            }
+            guiContext.cancel()
+            guiContext.close()
+        }
     }
 }
