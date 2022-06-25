@@ -5,3 +5,6 @@ build/
 # IDEs
 .idea/
 .vscode/
+
+# Fabric
+run/
