@@ -5,7 +5,16 @@ using a modern UI toolkit.
 
 ${dependencyNotice}
 
-The Compose dependency is bundled with fabrikmc-compose, you don't have to include it yourself.
+The Compose dependency is bundled with silk-compose, you don't have to include it yourself.
+
+Don't forget to apply the `id("org.jetbrains.compose")` Gradle plugin and add the following repositories as well:
+
+```kotlin
+mavenCentral()
+google()
+maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") // for unstable compose-jb
+// maven("https://androidx.dev/storage/compose-compiler/repository") // for unstable compose compiler
+```
 
 ## Usage
 
@@ -19,10 +28,11 @@ player.displayComposable(8, 6) {
 
 \\@Composable
 fun YourComposableFunction() {
+    var clicks by mutableStateOf(0)
     Button(
-        onClick = { logInfo("clicked button") }
+        onClick = { clicks++ }
     ) {
-        Text("Click me")
+        Text("Clicked \$clicks times")
     }
 }
 ```

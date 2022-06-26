@@ -34,10 +34,11 @@ player.displayComposable(8, 6) {
 
 @Composable
 fun YourComposableFunction() {
+    var clicks by mutableStateOf(0)
     Button(
-        onClick = { logInfo("clicked button") }
+        onClick = { clicks++ }
     ) {
-        Text("Click me")
+        Text("Clicked $clicks times")
     }
 }
 ```

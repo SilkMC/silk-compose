@@ -18,6 +18,8 @@ allprojects {
     group = "net.silkmc"
     version = "1.0.0"
 
+    description = "Silk Compose brings Kotlin compose-jb to Minecraft"
+
     tasks {
         withType<JavaCompile> {
             options.release.set(17)
