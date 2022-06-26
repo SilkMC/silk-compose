@@ -4,6 +4,7 @@ plugins {
     `mod-build-script`
     `project-publish-script`
     `mod-upload-script`
+    `dokka-script`
     id("com.google.devtools.ksp")
     id("org.jetbrains.compose")
 }

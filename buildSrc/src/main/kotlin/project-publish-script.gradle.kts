@@ -1,9 +1,13 @@
 plugins {
     `maven-publish`
     signing
+    kotlin("jvm")
 }
 
-val githubRepo = "SilkMC/silk-compose"
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
 
 publishing {
     repositories {

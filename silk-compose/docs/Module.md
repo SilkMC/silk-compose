@@ -1,4 +1,4 @@
-# Module fabrikmc-compose
+# Module silk-compose
 
 Adds server-side Compose support to the game. This allows you to create any gui you want, without any limitations -
 using a modern UI toolkit.
@@ -35,7 +35,9 @@ You can now have a look at the **UI** package (below) to see custom composable f
 
 There are docs at [Android Developer Website](https://developer.android.com/jetpack/compose/documentation) and you can
 find desktop specific documentation at the [compose-jb](https://github.com/JetBrains/compose-jb) repository.
-Additionally, there is a  [communtiy maintained playground](https://foso.github.io/Jetpack-Compose-Playground/).
+Additionally, there is a  [community maintained playground](https://foso.github.io/Jetpack-Compose-Playground/).
+For each Compose module, you can also find very useful API docs, e.g.
+[the ones for Material 3](https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary).
 
 # Package net.silkmc.silk.compose
 

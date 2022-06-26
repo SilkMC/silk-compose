@@ -1,8 +1,10 @@
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.google.devtools.ksp") version "1.7.0-1.0.6" apply false
     id("org.jetbrains.compose") version "1.2.0-alpha01-dev725" apply false
+    id("org.jetbrains.dokka")
 }
 
 allprojects {
@@ -39,3 +41,9 @@ allprojects {
 }
 
 extra["kotlin.code.style"] = "official"
+
+tasks {
+    withType<DokkaMultiModuleTask> {
+        includes.from("dokka/includes/main.md")
+    }
+}
