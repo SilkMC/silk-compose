@@ -23,7 +23,9 @@ publishing {
                 description.set(project.description)
 
                 developers {
-                    name.set("Jakob K")
+                    developer {
+                        name.set("Jakob K")
+                    }
                 }
 
                 licenses {
