@@ -26,11 +26,10 @@ dependencies {
 
     implementation(pluginDep("fabric-loom", "0.12-SNAPSHOT"))
     implementation(pluginDep("io.github.juuxel.loom-quiltflower", "1.7.3"))
-    implementation(pluginDep("org.quiltmc.quilt-mappings-on-loom", "4.2.0"))
     implementation(pluginDep("com.matthewprenger.cursegradle", "1.4.0"))
     implementation(pluginDep("com.modrinth.minotaur", "2.3.1"))
 
-    val compileDokkaVersion = "1.6.21"
+    val compileDokkaVersion = "1.7.0"
     val dokkaVersion = "1.7.0"
 
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:$compileDokkaVersion")
