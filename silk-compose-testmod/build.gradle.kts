@@ -6,7 +6,7 @@ plugins {
 description = "Testmod for Silk Compose"
 
 dependencies {
-    modImplementation(project(":${rootProject.name}"))
+    implementation(project(":${rootProject.name}", configuration = "namedElements"))
     modImplementation("net.silkmc:silk-commands:1.9.0")
 
     implementation(compose.desktop.currentOs)
