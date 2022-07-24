@@ -12,9 +12,11 @@ val includeTransitive: Configuration by configurations.creating {
     exclude(group = "com.mojang")
 }
 
+val flkDeps: Configuration by configurations.creating
+
 dependencies {
     ksp(project(":${rootProject.name}-ksp"))
-    include(compileOnly(project(":${rootProject.name}-mojang-api"))!!)
+    include(implementation(project(":${rootProject.name}-mojang-api"))!!)
 
     modApi("net.silkmc:silk-core:1.9.0")
 
@@ -33,8 +35,16 @@ dependencies {
     includeTransitive(compose.desktop.macos_x64)
     includeTransitive(compose.desktop.macos_arm64)
 
+    flkDeps("net.fabricmc:fabric-language-kotlin:1.8.2+kotlin.1.7.10")
+    val flkModules = flkDeps.resolvedConfiguration.firstLevelModuleDependencies
+        .flatMap { it.children }
+        .map { it.module.id.run { group to name } }
+
     includeTransitive.resolvedConfiguration.resolvedArtifacts.forEach {
-        include(it.moduleVersion.id.toString())
+        val id = it.moduleVersion.id
+        if (!flkModules.contains(id.group to it.name)) {
+            include(id.toString())
+        }
     }
 }
 
