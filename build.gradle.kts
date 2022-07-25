@@ -16,7 +16,7 @@ allprojects {
     }
 
     group = "net.silkmc"
-    version = "1.0.1"
+    version = "1.0.2"
 
     description = "Silk Compose brings Kotlin compose-jb to Minecraft"
 

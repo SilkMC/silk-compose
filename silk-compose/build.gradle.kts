@@ -16,7 +16,7 @@ val flkDeps: Configuration by configurations.creating
 
 dependencies {
     ksp(project(":${rootProject.name}-ksp"))
-    include(implementation(project(":${rootProject.name}-mojang-api"))!!)
+    include(compileOnly(project(":${rootProject.name}-mojang-api"))!!)
 
     modApi("net.silkmc:silk-core:1.9.0")
 
@@ -42,7 +42,7 @@ dependencies {
 
     includeTransitive.resolvedConfiguration.resolvedArtifacts.forEach {
         val id = it.moduleVersion.id
-        if (!flkModules.contains(id.group to it.name)) {
+        if (!flkModules.contains(id.group to id.name)) {
             include(id.toString())
         }
     }

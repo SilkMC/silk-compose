@@ -3,13 +3,13 @@ package net.silkmc.silk.compose.mojangapi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
 import java.nio.channels.Channels
 
 object LauncherMeta {
-    fun downloadClientTo(file: File, serverVersion: String) {
+
+    fun downloadClientTo(file: File, serverVersion: String, logInfo: (String) -> Unit = {}) {
         val json = Json { ignoreUnknownKeys = true }
 
         // request version info
@@ -22,11 +22,13 @@ object LauncherMeta {
 
         // download client
         logInfo("Downloading ${file.name}...")
-        file.outputStream().channel.transferFrom(Channels.newChannel(URL(clientDownloadUrl).openStream()), 0, Long.MAX_VALUE)
+        file.outputStream().channel.use { channel ->
+            Channels.newChannel(URL(clientDownloadUrl).openStream()).use { urlChannel ->
+                channel.transferFrom(urlChannel, 0, Long.MAX_VALUE)
+            }
+        }
         logInfo("Finished downloading the client")
     }
-
-    private fun logInfo(message: String) = LoggerFactory.getLogger("LauncherMeta").info(message)
 
     @Serializable
     private data class VersionManifest(val versions: List<Link>) {

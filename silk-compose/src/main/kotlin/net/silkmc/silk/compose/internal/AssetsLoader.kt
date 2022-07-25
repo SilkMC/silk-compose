@@ -38,7 +38,7 @@ object AssetsLoader {
                 val clientFile = assetsStorage.resolve("client-${serverVersion}.jar")
                 clientFile.parentFile.mkdirs()
                 clientFile.createNewFile()
-                LauncherMeta.downloadClientTo(clientFile, serverVersion)
+                LauncherMeta.downloadClientTo(clientFile, serverVersion, ::logInfo)
 
                 // extract assets
                 logInfo("Extracting assets...")

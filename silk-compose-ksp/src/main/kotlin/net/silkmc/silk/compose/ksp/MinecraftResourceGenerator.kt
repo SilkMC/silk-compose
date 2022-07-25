@@ -34,7 +34,7 @@ class MinecraftResourceGenerator(
 
         val clientFile = Files.createTempFile("minecraft-client-$version", ".jar")
         println(clientFile.toFile().canonicalPath)
-        LauncherMeta.downloadClientTo(clientFile.toFile(), version)
+        LauncherMeta.downloadClientTo(clientFile.toFile(), version, ::println)
 
         val textureTypes = listOf("block", "item", "misc", "mob_effect", "painting", "particle")
         val textureTypeContents = mutableMapOf<String, MutableList<String>>()
