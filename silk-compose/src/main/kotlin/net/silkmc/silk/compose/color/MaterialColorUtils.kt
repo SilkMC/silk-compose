@@ -1,18 +1,20 @@
 package net.silkmc.silk.compose.color
 
-import androidx.compose.ui.graphics.Color
 import com.github.ajalt.colormath.calculate.differenceCIE2000
 import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
 import com.github.ajalt.colormath.model.RGBInt
 import com.github.ajalt.colormath.transform.interpolate
 import com.github.ajalt.colormath.transform.multiplyAlpha
+import net.minecraft.world.level.material.MaterialColor
 import net.silkmc.silk.compose.mixin.MaterialColorAccessor
 import net.silkmc.silk.core.logging.logWarning
-import net.minecraft.world.level.material.MaterialColor
+
+private typealias ComposeColor = androidx.compose.ui.graphics.Color
+private typealias ColormathColor = com.github.ajalt.colormath.Color
 
 /**
- * Utilities for working with [MaterialColor].
+ * Utilities for working with Minecraft's [MaterialColor].
  */
 object MaterialColorUtils {
 
@@ -56,27 +58,35 @@ object MaterialColorUtils {
     /**
      * Same as [materialColorIds], but without white. This is used by the [toMaterialColorId] function.
      */
-    private val materialColorIdsNoWhite = materialColorIds.filterNot { it.second == whiteMaterialColorId }.toTypedArray()
+    private val materialColorIdsNoWhite = materialColorIds
+        .filterNot { it.second == whiteMaterialColorId }.toTypedArray()
 
     /**
      * Scales the given [color] down to a [MaterialColor] using
      * [differenceCIE2000] and returns the id of that material color.
      */
-    fun toMaterialColorId(color: com.github.ajalt.colormath.Color): Byte {
+    fun toMaterialColorId(color: ColormathColor): Byte {
         val interpolatedColor = color.run {
             if (alpha < 1f) white.interpolate(this, alpha) else this
         }
 
-        if (interpolatedColor.isNearlyWhite) return whiteMaterialColorId
+        if (interpolatedColor.isNearlyWhite)
+            return whiteMaterialColorId
 
-        return materialColorIdsNoWhite.minByOrNull { it.first.differenceCIE2000(interpolatedColor) }!!.second
+        return materialColorIdsNoWhite.minByOrNull { it.first.differenceCIE2000(interpolatedColor) }
+            ?.second ?: error("Could not find a matching material color id for $color")
     }
 
-    private val com.github.ajalt.colormath.Color.isNearlyWhite get() = differenceCIE2000(white) <= 2.5f
+    private val com.github.ajalt.colormath.Color.isNearlyWhite
+        get() = differenceCIE2000(white) <= 2.5f
 }
 
 /**
  * Converts the non-shaded color value of this [MaterialColor] instance to
  * the Compose [Color] representation.
  */
-fun MaterialColor.toCompose() = RGBInt(col.toUInt()).run { Color(r.toInt(), g.toInt(), b.toInt()) }
+fun MaterialColor.toCompose(): ComposeColor {
+    return RGBInt(col.toUInt()).run {
+        androidx.compose.ui.graphics.Color(r.toInt(), g.toInt(), b.toInt())
+    }
+}
