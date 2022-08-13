@@ -161,9 +161,10 @@ class MinecraftComposeGui(
 
         fun setColor(x: Int, y: Int, colorId: Byte) {
             val previousColorId = colors[x + y * 128]
-            colors[x + y * 128] = colorId
 
             if (previousColorId != colorId) {
+                colors[x + y * 128] = colorId
+
                 if (dirty) {
                     startX = min(startX, x); startY = min(startY, y)
                     endX = max(endX, x); endY = max(endY, y)
@@ -196,6 +197,9 @@ class MinecraftComposeGui(
 
     override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
+    @Suppress("OPT_IN_USAGE")
+    private val limitedDispatcher = Dispatchers.Default.limitedParallelism(1)
+
     // values for geometry
 
     private val guiDirection = player.direction.opposite
@@ -222,20 +226,9 @@ class MinecraftComposeGui(
 
     // values for color mapping
 
-    private val bitmapToMapColorCache = HashMap<Int, Byte>()
-    private fun bitmapToMapColor(bitmapColor: Int) = bitmapToMapColorCache.getOrPut(bitmapColor) {
-        Color(bitmapColor).run { SRGB(red, green, blue, alpha) }.let { color ->
-            when (color.alpha) {
-                0f -> MaterialColorUtils.whiteMaterialColorId
-                else -> MaterialColorUtils.toMaterialColorId(color)
-            }
-        }
-    }
+    private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
 
     // values for rendering
-
-    private val frameDispatcher = FrameDispatcher(coroutineContext) { updateMinecraftMaps() }
-    private val scene = ComposeScene(coroutineContext) { frameDispatcher.scheduleFrame() }
 
     private val guiChunks = Array(blockWidth * blockHeight) { GuiChunk() }
     private fun getGuiChunk(x: Int, y: Int) = guiChunks[x + y * blockWidth]
@@ -243,9 +236,22 @@ class MinecraftComposeGui(
     private var placedItemFrames = false
     private val itemFrameEntityIds = ArrayList<Int>(blockWidth * blockHeight)
 
+    private val bitmap = Bitmap().also {
+        if (!it.allocN32Pixels(blockWidth * 128, blockHeight * 128, true))
+            logError("Could not allocate the required resources for rendering the compose gui!")
+    }
+    private val canvas = Canvas(bitmap)
+
+    private val frameDispatcher = FrameDispatcher(coroutineContext) { updateMinecraftMaps() }
+    private val scene = ComposeScene(coroutineContext) { frameDispatcher.scheduleFrame() }
+
     init {
         scene.setContent {
-            Box(Modifier.size((blockWidth * 128).dp, (blockHeight * 128).dp)) {
+            Box(
+                Modifier
+                    .size((blockWidth * 128).dp, (blockHeight * 128).dp)
+                    //.background(Color.White.copy(alpha = 0f))
+            ) {
                 content(this@MinecraftComposeGui)
             }
         }
@@ -254,52 +260,70 @@ class MinecraftComposeGui(
         playerGuis[player.uuid] = this
     }
 
-    private fun updateMinecraftMaps() {
-        // TODO maybe don't initialize this for each update
-        val bitmap = Bitmap()
-        if (!bitmap.allocN32Pixels(blockWidth * 128, blockHeight * 128, true))
-            logError("Could not allocate the required resources for rendering the compose gui!")
-        val canvas = Canvas(bitmap)
+    private fun bitmapToMapColor(bitmapColor: Int): Byte {
+        return bitmapToMapColorCache.getOrPut(bitmapColor) {
+            val composeColor = Color(bitmapColor)
+            val rgb = composeColor.run { SRGB(red, green, blue, alpha) }
 
+            when (rgb.alpha) {
+                0f -> MaterialColorUtils.transparentMaterialColorId
+                else -> MaterialColorUtils.toMaterialColorId(rgb)
+            }
+        }
+    }
+
+    private suspend fun updateMinecraftMaps() {
         scene.render(canvas, System.nanoTime())
 
         val networkHandler = player.connection
 
-        for (xFrame in 0 until blockWidth) {
-            for (yFrame in 0 until blockHeight) {
-                val guiChunk = getGuiChunk(xFrame, yFrame)
-                val mapId = guiChunk.mapId
+        coroutineScope {
+            for (xFrame in 0 until blockWidth) {
+                for (yFrame in 0 until blockHeight) {
+                    launch(Dispatchers.Default) {
+                        val guiChunk = getGuiChunk(xFrame, yFrame)
+                        val mapId = guiChunk.mapId
 
-                for (x in 0 until 128) {
-                    for (y in 0 until 128) {
-                        guiChunk.setColor(x, y, bitmapToMapColor(bitmap.getColor(xFrame * 128 + x, yFrame * 128 + y)))
+                        for (x in 0 until 128) {
+                            for (y in 0 until 128) {
+                                val bitmapColor = bitmap.getColor(xFrame * 128 + x, yFrame * 128 + y)
+                                guiChunk.setColor(x, y, bitmapToMapColor(bitmapColor))
+                            }
+                        }
+
+                        // send the map data
+                        val updatePacket = guiChunk.createPacket()
+                        if (updatePacket != null) {
+                            networkHandler.send(updatePacket)
+                        }
+
+                        if (!placedItemFrames) {
+                            val framePos = position.below(yFrame).relative(placementDirection, xFrame)
+
+                            // spawn the fake item frame
+                            val itemFrame = GlowItemFrame(player.level, framePos, guiDirection)
+                            itemFrame.isInvisible = true
+                            networkHandler.send(itemFrame.addEntityPacket)
+                            withContext(limitedDispatcher) {
+                                itemFrameEntityIds += itemFrame.id
+                            }
+
+                            // put the map in the item frame
+                            val composeStack = Items.FILLED_MAP.defaultInstance.apply {
+                                orCreateTag.putInt("map", mapId)
+                            }
+                            itemFrame.setItem(composeStack, false)
+                            networkHandler.send(ClientboundSetEntityDataPacket(itemFrame.id, itemFrame.entityData, true))
+                        }
                     }
-                }
-
-                // send the map data
-                val updatePacket = guiChunk.createPacket()
-                if (updatePacket != null) networkHandler.send(updatePacket)
-
-                if (!placedItemFrames) {
-                    val framePos = position.below(yFrame).relative(placementDirection, xFrame)
-
-                    // spawn the fake item frame
-                    val itemFrame = GlowItemFrame(player.level, framePos, guiDirection)
-                    itemFrameEntityIds += itemFrame.id
-                    itemFrame.isInvisible = true
-                    networkHandler.send(itemFrame.addEntityPacket)
-
-                    // put the map in the item frame
-                    val composeStack = Items.FILLED_MAP.defaultInstance.apply {
-                        orCreateTag.putInt("map", mapId)
-                    }
-                    itemFrame.setItem(composeStack, false)
-                    networkHandler.send(ClientboundSetEntityDataPacket(itemFrame.id, itemFrame.entityData, true))
                 }
             }
         }
 
         if (!placedItemFrames) placedItemFrames = true
+
+        // TODO check this on macos
+        canvas.clear(0)
     }
 
     private fun calculateOffset(): Offset? {
@@ -360,14 +384,15 @@ class MinecraftComposeGui(
      * if the server shuts down.
      */
     fun close() {
-        player.connection.send(ClientboundRemoveEntitiesPacket(*itemFrameEntityIds.toIntArray()))
         playerGuis.remove(player.uuid, this)
-        MapIdGenerator.makeOldIdAvailable(guiChunks.map { it.mapId })
 
         val guiContext = coroutineContext
 
         silkCoroutineScope.launch {
             withContext(guiContext) {
+                player.connection.send(ClientboundRemoveEntitiesPacket(*itemFrameEntityIds.toIntArray()))
+                MapIdGenerator.makeOldIdAvailable(guiChunks.map { it.mapId })
+
                 frameDispatcher.cancel()
                 scene.close()
             }

@@ -21,6 +21,11 @@ object MaterialColorUtils {
     private val white = RGB(1f, 1f, 1f)
 
     /**
+     * The [MaterialColor] id for transparency.
+     */
+    const val transparentMaterialColorId = 0.toByte()
+
+    /**
      * The [MaterialColor] id of pure white.
      */
     val whiteMaterialColorId = (MaterialColor.SNOW.id * 4 + 2).toByte()
