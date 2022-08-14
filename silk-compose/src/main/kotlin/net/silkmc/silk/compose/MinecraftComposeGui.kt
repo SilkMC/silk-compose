@@ -1,5 +1,8 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package net.silkmc.silk.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
@@ -58,12 +61,14 @@ import kotlin.math.min
 fun ServerPlayer.displayComposable(
     blockWidth: Int, blockHeight: Int,
     position: BlockPos = blockPosition().relative(direction, 2),
+    backgroundColor: Color = Color.White,
     content: @Composable BoxScope.(gui: MinecraftComposeGui) -> Unit,
 ) = MinecraftComposeGui(
     blockWidth, blockHeight,
     content,
     this,
-    position
+    position,
+    backgroundColor
 )
 
 /**
@@ -79,6 +84,7 @@ class MinecraftComposeGui(
     val content: @Composable BoxScope.(gui: MinecraftComposeGui) -> Unit,
     val player: ServerPlayer,
     val position: BlockPos,
+    val backgroundColor: Color,
 ) : CoroutineScope {
     companion object {
         private val playerGuis = ConcurrentHashMap<UUID, MinecraftComposeGui>()
@@ -227,6 +233,7 @@ class MinecraftComposeGui(
     // values for color mapping
 
     private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
+    private val backgroundColormathColor = backgroundColor.run { SRGB(red, green, blue, alpha) }
 
     // values for rendering
 
@@ -236,12 +243,6 @@ class MinecraftComposeGui(
     private var placedItemFrames = false
     private val itemFrameEntityIds = ArrayList<Int>(blockWidth * blockHeight)
 
-    private val bitmap = Bitmap().also {
-        if (!it.allocN32Pixels(blockWidth * 128, blockHeight * 128, true))
-            logError("Could not allocate the required resources for rendering the compose gui!")
-    }
-    private val canvas = Canvas(bitmap)
-
     private val frameDispatcher = FrameDispatcher(coroutineContext) { updateMinecraftMaps() }
     private val scene = ComposeScene(coroutineContext) { frameDispatcher.scheduleFrame() }
 
@@ -250,7 +251,7 @@ class MinecraftComposeGui(
             Box(
                 Modifier
                     .size((blockWidth * 128).dp, (blockHeight * 128).dp)
-                    //.background(Color.White.copy(alpha = 0f))
+                    .background(backgroundColor)
             ) {
                 content(this@MinecraftComposeGui)
             }
@@ -262,17 +263,20 @@ class MinecraftComposeGui(
 
     private fun bitmapToMapColor(bitmapColor: Int): Byte {
         return bitmapToMapColorCache.getOrPut(bitmapColor) {
-            val composeColor = Color(bitmapColor)
-            val rgb = composeColor.run { SRGB(red, green, blue, alpha) }
+            val rgb = Color(bitmapColor)
+                .run { SRGB(red, green, blue, alpha) }
 
-            when (rgb.alpha) {
-                0f -> MaterialColorUtils.transparentMaterialColorId
-                else -> MaterialColorUtils.toMaterialColorId(rgb)
-            }
+            MaterialColorUtils.toMaterialColorId(rgb, backgroundColormathColor)
         }
     }
 
     private suspend fun updateMinecraftMaps() {
+        val bitmap = Bitmap().also {
+            if (!it.allocN32Pixels(blockWidth * 128, blockHeight * 128, true))
+                logError("Could not allocate the required resources for rendering the compose gui!")
+        }
+        val canvas = Canvas(bitmap)
+
         scene.render(canvas, System.nanoTime())
 
         val networkHandler = player.connection
@@ -320,10 +324,11 @@ class MinecraftComposeGui(
             }
         }
 
-        if (!placedItemFrames) placedItemFrames = true
+        if (!placedItemFrames)
+            placedItemFrames = true
 
         // TODO check this on macos
-        canvas.clear(0)
+        //canvas.clear(0)
     }
 
     private fun calculateOffset(): Offset? {

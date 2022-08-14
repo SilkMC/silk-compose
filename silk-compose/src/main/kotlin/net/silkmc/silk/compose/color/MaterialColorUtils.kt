@@ -70,16 +70,23 @@ object MaterialColorUtils {
      * Scales the given [color] down to a [MaterialColor] using
      * [differenceCIE2000] and returns the id of that material color.
      */
-    fun toMaterialColorId(color: ColormathColor): Byte {
-        val interpolatedColor = color.run {
-            if (alpha < 1f) white.interpolate(this, alpha) else this
-        }
+    fun toMaterialColorId(color: ColormathColor, background: ColormathColor): Byte {
+        if (color.alpha <= 0f)
+            return transparentMaterialColorId
 
-        if (interpolatedColor.isNearlyWhite)
-            return whiteMaterialColorId
+        val interpolatedColor = if (color.alpha >= 1f) color else background.interpolate(color, color.alpha)
 
-        return materialColorIdsNoWhite.minByOrNull { it.first.differenceCIE2000(interpolatedColor) }
-            ?.second ?: error("Could not find a matching material color id for $color")
+        if (interpolatedColor.alpha != 1f)
+            logWarning("interpolated color alpha is not 1 (it is ${interpolatedColor.alpha})")
+
+        val searchColor = if (interpolatedColor.differenceCIE2000(background) <= 2.5f) {
+            if (background.alpha <= 0f)
+                return transparentMaterialColorId
+            background
+        } else color
+
+        return materialColorIds.minByOrNull { it.first.differenceCIE2000(searchColor) }
+            ?.second ?: error("Could not find a matching material color id for $color on $background")
     }
 
     private val com.github.ajalt.colormath.Color.isNearlyWhite
