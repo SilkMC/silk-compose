@@ -7,5 +7,5 @@ description = "Testmod for Silk Compose"
 
 dependencies {
     implementation(project(":${rootProject.name}", configuration = "developmentElements"))
-    modImplementation("net.silkmc:silk-commands:1.9.0")
+    modImplementation("net.silkmc:silk-commands:1.9.1")
 }

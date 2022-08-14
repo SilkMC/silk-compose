@@ -25,7 +25,10 @@ allprojects {
             options.release.set(17)
         }
         withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = "17"
+            kotlinOptions {
+                jvmTarget = "17"
+                freeCompilerArgs += listOf("-Xcontext-receivers", "-Xskip-prerelease-check")
+            }
         }
     }
 

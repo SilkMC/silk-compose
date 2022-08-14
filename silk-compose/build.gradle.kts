@@ -25,7 +25,7 @@ dependencies {
     ksp(project(":${rootProject.name}-ksp"))
     include(compileOnly(project(":${rootProject.name}-mojang-api"))!!)
 
-    modApi("net.silkmc:silk-core:1.9.0")
+    modApi("net.silkmc:silk-core:1.9.1")
 
     includeTransitive(implementation("org.jetbrains.kotlinx:multik-default-jvm:0.2.0")!!)
     includeTransitive(implementation("com.github.ajalt.colormath:colormath-jvm:3.2.0")!!)
