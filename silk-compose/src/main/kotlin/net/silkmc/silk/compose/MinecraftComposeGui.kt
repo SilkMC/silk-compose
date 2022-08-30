@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -16,7 +15,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.dp
 import com.github.ajalt.colormath.model.SRGB
 import kotlinx.coroutines.*
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -88,7 +86,8 @@ class MinecraftComposeGui(
     val player: ServerPlayer,
     val position: BlockPos,
     val backgroundColor: Color,
-) : CoroutineScope {
+) {
+
     companion object {
         private val playerGuis = ConcurrentHashMap<UUID, MinecraftComposeGui>()
 
@@ -205,7 +204,8 @@ class MinecraftComposeGui(
         }
     }
 
-    override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val coroutineScope = CoroutineScope(coroutineContext)
 
     @Suppress("OPT_IN_USAGE")
     private val limitedDispatcher = Dispatchers.Default.limitedParallelism(1)
@@ -362,15 +362,16 @@ class MinecraftComposeGui(
         return Offset((planeX * 128).toFloat(), (planeY * 128).toFloat())
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun onLeftClick() = launch {
-        val offset = calculateOffset() ?: return@launch
+    private fun onLeftClick() {
+        val offset = calculateOffset() ?: return
 
-        // ensure that the following press-release combo is in correct order, therefore release
-        scene.sendPointerEvent(PointerEventType.Release, offset)
+        coroutineScope.launch {
+            // ensure that the following press-release combo is in correct order, therefore release
+            scene.sendPointerEvent(PointerEventType.Release, offset)
 
-        scene.sendPointerEvent(PointerEventType.Press, offset)
-        scene.sendPointerEvent(PointerEventType.Release, offset)
+            scene.sendPointerEvent(PointerEventType.Press, offset)
+            scene.sendPointerEvent(PointerEventType.Release, offset)
+        }
     }
 
     private fun onScroll(delta: Float): Boolean {
@@ -380,8 +381,7 @@ class MinecraftComposeGui(
         player.connection.send(ClientboundSetCarriedItemPacket(4))
         player.inventory.selected = 4
 
-        launch {
-            @OptIn(ExperimentalComposeUiApi::class)
+        coroutineScope.launch {
             scene.sendPointerEvent(PointerEventType.Scroll, offset, Offset(0f, delta))
         }
         return true
