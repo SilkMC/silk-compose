@@ -17,7 +17,7 @@ repositories {
 dependencies {
     fun pluginDep(id: String, version: String) = "${id}:${id}.gradle.plugin:${version}"
 
-    val kotlinVersion = "1.7.0"
+    val kotlinVersion = "1.7.10"
 
     compileOnly(kotlin("gradle-plugin", embeddedKotlinVersion))
     runtimeOnly(kotlin("gradle-plugin", kotlinVersion))
@@ -30,7 +30,7 @@ dependencies {
     implementation(pluginDep("com.modrinth.minotaur", "2.3.1"))
 
     val compileDokkaVersion = "1.7.0"
-    val dokkaVersion = "1.7.0"
+    val dokkaVersion = "1.7.10"
 
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:$compileDokkaVersion")
     runtimeOnly("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")

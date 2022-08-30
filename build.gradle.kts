@@ -2,8 +2,8 @@ import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.google.devtools.ksp") version "1.7.0-1.0.6" apply false
-    id("org.jetbrains.compose") version "1.2.0-alpha01-dev755" apply false
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6" apply false
+    id("org.jetbrains.compose") version "1.2.0-alpha01-dev774" apply false
     id("org.jetbrains.dokka")
 }
 

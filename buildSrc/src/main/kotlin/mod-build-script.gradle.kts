@@ -12,6 +12,6 @@ dependencies {
         officialMojangMappings()
     })
     excludedDeps(modImplementation("net.fabricmc:fabric-loader:0.14.9")!!)
-    excludedDeps(modImplementation("net.fabricmc.fabric-api:fabric-api:0.59.0+1.19.2")!!)
-    excludedDeps(modImplementation("net.fabricmc:fabric-language-kotlin:1.8.1+kotlin.1.7.0")!!)
+    excludedDeps(modImplementation("net.fabricmc.fabric-api:fabric-api:0.60.0+1.19.2")!!)
+    excludedDeps(modImplementation("net.fabricmc:fabric-language-kotlin:1.8.3+kotlin.1.7.10")!!)
 }
