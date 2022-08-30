@@ -15,9 +15,10 @@ val includeTransitive: Configuration by configurations.creating {
 val excludedDeps: Configuration by configurations.getting
 
 // workaround for project dependencies on this module (needed for the testmod)
+// adding compileOnly here is a workaround for a different issue where includes won't get loaded
 configurations {
     register("developmentElements") {
-        extendsFrom(implementation.get(), namedElements.get(), api.get())
+        extendsFrom(implementation.get(), namedElements.get(), api.get(), compileOnly.get())
     }
 }
 
