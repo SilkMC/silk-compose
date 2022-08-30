@@ -30,6 +30,9 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData
 import net.minecraft.world.phys.Vec3
 import net.silkmc.silk.compose.color.MaterialColorUtils
 import net.silkmc.silk.compose.internal.MapIdGenerator
+import net.silkmc.silk.core.annotations.ExperimentalSilkApi
+import net.silkmc.silk.core.event.Events
+import net.silkmc.silk.core.event.Server
 import net.silkmc.silk.core.logging.logError
 import net.silkmc.silk.core.task.silkCoroutineScope
 import org.jetbrains.kotlinx.multik.api.linalg.dot
@@ -90,7 +93,8 @@ class MinecraftComposeGui(
         private val playerGuis = ConcurrentHashMap<UUID, MinecraftComposeGui>()
 
         init {
-            ServerLifecycleEvents.SERVER_STOPPING.register {
+            @OptIn(ExperimentalSilkApi::class)
+            Events.Server.postStop.listen {
                 playerGuis.values.forEach { it.close() }
                 playerGuis.clear()
             }
