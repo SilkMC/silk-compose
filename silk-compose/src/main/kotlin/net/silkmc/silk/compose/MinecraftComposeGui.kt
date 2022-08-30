@@ -237,7 +237,6 @@ class MinecraftComposeGui(
     // values for color mapping
 
     private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
-    private val backgroundColormathColor = backgroundColor.run { SRGB(red, green, blue, alpha) }
 
     // values for rendering
 
@@ -270,7 +269,7 @@ class MinecraftComposeGui(
             val rgb = Color(bitmapColor)
                 .run { SRGB(red, green, blue, alpha) }
 
-            MaterialColorUtils.toMaterialColorId(rgb, backgroundColormathColor)
+            MaterialColorUtils.toMaterialColorId(rgb).mapByte
         }
     }
 
