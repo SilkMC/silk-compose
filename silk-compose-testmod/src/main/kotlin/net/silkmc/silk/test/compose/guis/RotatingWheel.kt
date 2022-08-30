@@ -10,12 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import net.silkmc.silk.core.logging.logInfo
+import kotlcinx.coroutines.launch
+import net.silkmc.silk.test.compose.util.rememberBitmapResource
 
 private enum class WheelState {
     STATIC, ROLLING, STOPPING;
@@ -92,14 +88,4 @@ fun RotatingWheel() {
             }
         }
     }
-}
-
-@Composable
-private fun rememberBitmapResource(path: String): ImageBitmap? {
-    return produceState<ImageBitmap?>(null) {
-        value = withContext(Dispatchers.IO) {
-            logInfo("Loading $path resource as image bitmap")
-            loadImageBitmap(Unit::class.java.getResourceAsStream(path)!!.buffered())
-        }
-    }.value
 }
