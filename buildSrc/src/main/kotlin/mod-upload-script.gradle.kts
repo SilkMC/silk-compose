@@ -14,7 +14,7 @@ modrinth {
     projectId.set("xmi76FJb")
     versionNumber.set(rootProject.version.toString())
     versionType.set("release")
-    gameVersions.set(listOf("1.19"))
+    gameVersions.set(listOf(minecraftVersion))
     loaders.set(listOf("fabric"))
 
     uploadFile.set(tasks.remapJar.get())

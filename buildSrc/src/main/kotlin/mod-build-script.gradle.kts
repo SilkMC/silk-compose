@@ -6,7 +6,7 @@ plugins {
 val excludedDeps: Configuration by configurations.creating
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.19.2")
+    minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings(loom.layered {
         //mappings("net.fabricmc:yarn:1.19+build.4")
         officialMojangMappings()
