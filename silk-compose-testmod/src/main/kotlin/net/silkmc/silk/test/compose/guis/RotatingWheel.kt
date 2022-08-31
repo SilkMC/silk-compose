@@ -10,7 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import kotlcinx.coroutines.launch
+import kotlinx.coroutines.launch
 import net.silkmc.silk.test.compose.util.rememberBitmapResource
 
 private enum class WheelState {

@@ -1,13 +1,11 @@
 package net.silkmc.silk.test.compose.commands
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import net.silkmc.silk.commands.command
 import net.silkmc.silk.compose.displayComposable
 import net.silkmc.silk.compose.ui.McWindowHeader
+import net.silkmc.silk.test.compose.application.TestApplicationCompanion
 import net.silkmc.silk.test.compose.game.FallingBallsGameComposable
 import net.silkmc.silk.test.compose.guis.GeneralTestComposable
 import net.silkmc.silk.test.compose.guis.RotatingWheel
@@ -42,6 +40,15 @@ val composeCommand = command("compose") {
             backgroundColor = Color.White.copy(0f)
         ) {
             RotatingWheel()
+        }
+    }
+
+    literal("app_companion") runs {
+        source.playerOrException.displayComposable(
+            4, 4,
+            backgroundColor = Color.White.copy(0f)
+        ) {
+            TestApplicationCompanion()
         }
     }
 }
