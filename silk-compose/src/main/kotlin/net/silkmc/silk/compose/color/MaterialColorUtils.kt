@@ -25,9 +25,8 @@ object MaterialColorUtils {
     }
 
     /**
-     * A list of colors in the [LAB] representation mapped to their pre-calculated
-     * [MaterialColor] id. (Pre-calculated means that they have been multiplied by 4 and
-     * their shade has been added to the id.)
+     * A list of pre-calculated color shades. For each [MaterialColor], there
+     * are 4 shades (for each [MaterialColor.Brightness]). See [MaterialColorShade].
      */
     private val materialColorShades = MaterialColorAccessor.getMaterialColors()
         .filter { it != null && it.col != 0 }

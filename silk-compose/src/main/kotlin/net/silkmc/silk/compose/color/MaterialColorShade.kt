@@ -8,6 +8,10 @@ import com.github.ajalt.colormath.model.RGBInt
 import com.github.ajalt.colormath.transform.multiplyAlpha
 import net.minecraft.world.level.material.MaterialColor
 
+/**
+ * A pre-calculated color shade of the [materialColor] with
+ * the given [brightness].
+ */
 data class MaterialColorShade(
     val materialColor: MaterialColor,
     val brightness: MaterialColor.Brightness,
