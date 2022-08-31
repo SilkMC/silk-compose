@@ -207,7 +207,7 @@ class MinecraftComposeGui(
     private val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     private val coroutineScope = CoroutineScope(coroutineContext)
 
-    @Suppress("OPT_IN_USAGE")
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val limitedDispatcher = Dispatchers.Default.limitedParallelism(1)
 
     // values for geometry
@@ -225,14 +225,22 @@ class MinecraftComposeGui(
     private val planePoint = displayPosition.toMkArray()
     private val planeNormal = guiDirection.normal.toMkArray()
 
-    private val topCorner = displayPosition.below(blockHeight - 1).relative(
-        placementDirection,
-        blockWidth - (if (guiDirection == Direction.WEST || guiDirection == Direction.SOUTH) 0 else 1)
-    ).withoutAxis(guiDirection.axis)
-    private val bottomCorner = displayPosition.relative(placementDirection.opposite).above().relative(
-        placementDirection,
-        if (guiDirection == Direction.WEST || guiDirection == Direction.SOUTH) 1 else 0
-    ).withoutAxis(guiDirection.axis)
+    private val topCorner = displayPosition
+        .below(blockHeight - 1)
+        .relative(
+            placementDirection,
+            blockWidth - (if (guiDirection == Direction.WEST || guiDirection == Direction.SOUTH) 0 else 1)
+        )
+        .withoutAxis(guiDirection.axis)
+
+    private val bottomCorner = displayPosition
+        .relative(placementDirection.opposite)
+        .above()
+        .relative(
+            placementDirection,
+            if (guiDirection == Direction.WEST || guiDirection == Direction.SOUTH) 1 else 0
+        )
+        .withoutAxis(guiDirection.axis)
 
     // values for color mapping
 
@@ -327,8 +335,9 @@ class MinecraftComposeGui(
             }
         }
 
-        if (!placedItemFrames)
+        if (!placedItemFrames) {
             placedItemFrames = true
+        }
 
         // TODO check this on macos
         //canvas.clear(0)
