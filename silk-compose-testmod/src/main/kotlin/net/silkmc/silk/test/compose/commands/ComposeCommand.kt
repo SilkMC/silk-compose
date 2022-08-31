@@ -6,6 +6,7 @@ import net.silkmc.silk.commands.command
 import net.silkmc.silk.compose.displayComposable
 import net.silkmc.silk.compose.ui.McWindowHeader
 import net.silkmc.silk.test.compose.application.TestApplicationCompanion
+import net.silkmc.silk.test.compose.application.testApplication
 import net.silkmc.silk.test.compose.game.FallingBallsGameComposable
 import net.silkmc.silk.test.compose.guis.GeneralTestComposable
 import net.silkmc.silk.test.compose.guis.RotatingWheel
@@ -44,6 +45,8 @@ val composeCommand = command("compose") {
     }
 
     literal("app_companion") runs {
+        desktopApplication.value
+
         source.playerOrException.displayComposable(
             4, 4,
             backgroundColor = Color.White.copy(0f)
@@ -51,4 +54,8 @@ val composeCommand = command("compose") {
             TestApplicationCompanion()
         }
     }
+}
+
+private val desktopApplication = lazy {
+    testApplication()
 }
