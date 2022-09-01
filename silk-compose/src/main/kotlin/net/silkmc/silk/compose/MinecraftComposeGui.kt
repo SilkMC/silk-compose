@@ -55,6 +55,8 @@ import kotlin.math.min
  *
  * @param blockWidth the width of the gui **in blocks**
  * @param blockHeight the height of the gui **in blocks**
+ * @param position the position where the gui will be created in-game
+ * @param backgroundColor the background color of the gui, can be transparent as well
  * @param content define your gui using composable functions in here
  *
  * @see MinecraftComposeGui
