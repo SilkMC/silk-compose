@@ -32,6 +32,7 @@ import net.silkmc.silk.core.annotations.ExperimentalSilkApi
 import net.silkmc.silk.core.event.Events
 import net.silkmc.silk.core.event.Server
 import net.silkmc.silk.core.logging.logError
+import net.silkmc.silk.core.task.mcSyncLaunch
 import net.silkmc.silk.core.task.silkCoroutineScope
 import org.jetbrains.kotlinx.multik.api.linalg.dot
 import org.jetbrains.kotlinx.multik.api.mk
@@ -204,6 +205,11 @@ class MinecraftComposeGui(
             val updateData = MapItemSavedData.MapPatch(startX, startY, width, height, packetColors)
             return ClientboundMapItemDataPacket(mapId, 0, false, null, updateData)
         }
+
+        fun createClearPacket(): ClientboundMapItemDataPacket {
+            val updateData = MapItemSavedData.MapPatch(0, 0, 128, 128, ByteArray(128 * 128))
+            return ClientboundMapItemDataPacket(mapId, 0, false, null, updateData)
+        }
     }
 
     private val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
@@ -292,14 +298,13 @@ class MinecraftComposeGui(
 
         scene.render(canvas, System.nanoTime())
 
-        val networkHandler = player.connection
+        val connection = player.connection
 
         coroutineScope {
             for (xFrame in 0 until blockWidth) {
                 for (yFrame in 0 until blockHeight) {
                     launch(Dispatchers.Default) {
                         val guiChunk = getGuiChunk(xFrame, yFrame)
-                        val mapId = guiChunk.mapId
 
                         for (x in 0 until 128) {
                             for (y in 0 until 128) {
@@ -308,29 +313,31 @@ class MinecraftComposeGui(
                             }
                         }
 
-                        // send the map data
-                        val updatePacket = guiChunk.createPacket()
-                        if (updatePacket != null) {
-                            networkHandler.send(updatePacket)
-                        }
-
                         if (!placedItemFrames) {
                             val framePos = position.below(yFrame).relative(placementDirection, xFrame)
 
                             // spawn the fake item frame
                             val itemFrame = GlowItemFrame(player.level, framePos, guiDirection)
                             itemFrame.isInvisible = true
-                            networkHandler.send(itemFrame.addEntityPacket)
+                            connection.send(itemFrame.addEntityPacket)
                             withContext(limitedDispatcher) {
                                 itemFrameEntityIds += itemFrame.id
                             }
 
                             // put the map in the item frame
                             val composeStack = Items.FILLED_MAP.defaultInstance.apply {
-                                orCreateTag.putInt("map", mapId)
+                                orCreateTag.putInt("map", guiChunk.mapId)
                             }
                             itemFrame.setItem(composeStack, false)
-                            networkHandler.send(ClientboundSetEntityDataPacket(itemFrame.id, itemFrame.entityData, true))
+                            connection.send(ClientboundSetEntityDataPacket(itemFrame.id, itemFrame.entityData, true))
+
+                            connection.send(guiChunk.createClearPacket())
+                        }
+
+                        // send the map data
+                        val updatePacket = guiChunk.createPacket()
+                        if (updatePacket != null) {
+                            connection.send(updatePacket)
                         }
                     }
                 }
@@ -410,11 +417,25 @@ class MinecraftComposeGui(
         silkCoroutineScope.launch {
             withContext(guiContext) {
                 player.connection.send(ClientboundRemoveEntitiesPacket(*itemFrameEntityIds.toIntArray()))
-                MapIdGenerator.makeOldIdAvailable(guiChunks.map { it.mapId })
 
-                frameDispatcher.cancel()
-                scene.close()
+                try {
+                    frameDispatcher.cancel()
+                    scene.close()
+                } finally {
+                    coroutineScope {
+                        guiChunks.forEach {
+                            mcSyncLaunch {
+                                if (!player.hasDisconnected()) {
+                                    player.connection.send(it.createClearPacket())
+                                }
+                            }
+                        }
+                    }
+
+                    MapIdGenerator.makeOldIdsAvailable(guiChunks.map { it.mapId })
+                }
             }
+
             guiContext.cancel()
             guiContext.close()
         }

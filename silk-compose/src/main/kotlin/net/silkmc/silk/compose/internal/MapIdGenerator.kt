@@ -19,7 +19,7 @@ internal object MapIdGenerator {
         }
     }
 
-    fun makeOldIdAvailable(ids: Collection<Int>) {
+    fun makeOldIdsAvailable(ids: Collection<Int>) {
         silkCoroutineScope.launch {
             mutex.withLock {
                 availableOldIds.addAll(ids)
