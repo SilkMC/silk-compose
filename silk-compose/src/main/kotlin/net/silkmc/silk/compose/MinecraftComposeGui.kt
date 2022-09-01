@@ -18,37 +18,29 @@ import kotlinx.coroutines.*
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.*
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
-import net.minecraft.world.level.saveddata.maps.MapItemSavedData
-import net.minecraft.world.phys.Vec3
 import net.silkmc.silk.compose.color.MaterialColorUtils
 import net.silkmc.silk.compose.internal.MapIdGenerator
+import net.silkmc.silk.compose.util.MathUtil
+import net.silkmc.silk.compose.util.MathUtil.toMkArray
+import net.silkmc.silk.compose.util.MathUtil.withoutAxis
 import net.silkmc.silk.core.annotations.ExperimentalSilkApi
 import net.silkmc.silk.core.event.Events
 import net.silkmc.silk.core.event.Server
 import net.silkmc.silk.core.logging.logError
 import net.silkmc.silk.core.task.mcSyncLaunch
 import net.silkmc.silk.core.task.silkCoroutineScope
-import org.jetbrains.kotlinx.multik.api.linalg.dot
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.ndarray
-import org.jetbrains.kotlinx.multik.ndarray.data.D1Array
-import org.jetbrains.kotlinx.multik.ndarray.data.get
-import org.jetbrains.kotlinx.multik.ndarray.operations.minus
-import org.jetbrains.kotlinx.multik.ndarray.operations.times
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.FrameDispatcher
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.collections.set
 
 /**
  * Creates a new server-side [MinecraftComposeGui]. This allows you to use any
@@ -127,88 +119,6 @@ class MinecraftComposeGui(
             }
 
             return gui.onScroll(scrollDelta * 3)
-        }
-
-        private fun Vec3.toMkArray() = mk.ndarray(doubleArrayOf(x, y, z))
-        private fun Vec3i.toMkArray() = mk.ndarray(doubleArrayOf(x.toDouble(), y.toDouble(), z.toDouble()))
-
-        // taken from http://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane#Kotlin
-        private fun rayPlaneIntersection(
-            rayPoint: D1Array<Double>,
-            rayVector: D1Array<Double>,
-            planePoint: D1Array<Double>,
-            planeNormal: D1Array<Double>,
-        ): D1Array<Double> {
-            val diff = rayPoint - planePoint
-            val prod1 = diff dot planeNormal
-            val prod2 = rayVector dot planeNormal
-            val prod3 = prod1 / prod2
-            return rayPoint - rayVector * prod3
-        }
-
-        private fun BlockPos.withoutAxis(axis: Direction.Axis) = when (axis) {
-            Direction.Axis.X -> z.toDouble() to y.toDouble()
-            Direction.Axis.Z -> x.toDouble() to y.toDouble()
-            // just for the compiler
-            Direction.Axis.Y -> x.toDouble() to z.toDouble()
-        }
-
-        private fun D1Array<Double>.withoutAxis(axis: Direction.Axis) = when (axis) {
-            Direction.Axis.X -> this[2] to this[1]
-            Direction.Axis.Z -> this[0] to this[1]
-            // just for the compiler
-            Direction.Axis.Y -> this[0] to this[2]
-        }
-    }
-
-    private class GuiChunk(
-        val mapId: Int = MapIdGenerator.nextId(),
-        private val colors: ByteArray = ByteArray(128 * 128),
-    ) {
-        private var dirty = false
-        private var startX = 0
-        private var startY = 0
-        private var endX = 0
-        private var endY = 0
-
-        fun setColor(x: Int, y: Int, colorId: Byte) {
-            val previousColorId = colors[x + y * 128]
-
-            if (previousColorId != colorId) {
-                colors[x + y * 128] = colorId
-
-                if (dirty) {
-                    startX = min(startX, x); startY = min(startY, y)
-                    endX = max(endX, x); endY = max(endY, y)
-                } else {
-                    dirty = true
-                    startX = x; startY = y
-                    endX = x; endY = y
-                }
-            }
-        }
-
-        fun createPacket(): ClientboundMapItemDataPacket? {
-            if (!dirty) return null
-            dirty = false
-
-            val width = endX + 1 - startX
-            val height = endY + 1 - startY
-            val packetColors = ByteArray(width * height)
-
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    packetColors[x + y * width] = colors[startX + x + (startY + y) * 128]
-                }
-            }
-
-            val updateData = MapItemSavedData.MapPatch(startX, startY, width, height, packetColors)
-            return ClientboundMapItemDataPacket(mapId, 0, false, null, updateData)
-        }
-
-        fun createClearPacket(): ClientboundMapItemDataPacket {
-            val updateData = MapItemSavedData.MapPatch(0, 0, 128, 128, ByteArray(128 * 128))
-            return ClientboundMapItemDataPacket(mapId, 0, false, null, updateData)
         }
     }
 
@@ -353,7 +263,7 @@ class MinecraftComposeGui(
     }
 
     private fun calculateOffset(): Offset? {
-        val intersection = rayPlaneIntersection(
+        val intersection = MathUtil.rayPlaneIntersection(
             player.eyePosition.toMkArray(),
             player.lookAngle.toMkArray(),
             planePoint,
