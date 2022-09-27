@@ -86,6 +86,8 @@ class MinecraftComposeGui(
     companion object {
         private val playerGuis = ConcurrentHashMap<UUID, MinecraftComposeGui>()
 
+        private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
+
         init {
             @OptIn(ExperimentalSilkApi::class)
             Events.Server.postStop.listen {
@@ -159,10 +161,6 @@ class MinecraftComposeGui(
             if (guiDirection == Direction.WEST || guiDirection == Direction.SOUTH) 1 else 0
         )
         .withoutAxis(guiDirection.axis)
-
-    // values for color mapping
-
-    private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
 
     // values for rendering
 
