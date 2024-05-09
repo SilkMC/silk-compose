@@ -15,11 +15,10 @@ import com.github.ajalt.colormath.calculate.isInSRGBGamut
 import com.github.ajalt.colormath.model.HSV
 import com.github.ajalt.colormath.model.SRGB
 import com.godaddy.android.colorpicker.ClassicColorPicker
+import com.godaddy.android.colorpicker.HsvColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import net.silkmc.silk.compose.color.MaterialColorUtils
-import net.silkmc.silk.core.Silk
-import net.silkmc.silk.core.annotations.DelicateSilkApi
 import net.silkmc.silk.test.compose.util.rememberBitmapResource
 
 private var inputColor by mutableStateOf(SRGB(0, 0, 0))
@@ -30,14 +29,12 @@ fun testApplication() = CoroutineScope(Dispatchers.Default).launchApplication {
     Window(
         onCloseRequest = {
             exitApplication()
-            @OptIn(DelicateSilkApi::class)
-            Silk.currentServer?.halt(false)
         },
         title = "Color Conversion Test",
         state = rememberWindowState(width = 800.dp, height = 600.dp)
     ) {
         Column {
-            ClassicColorPicker(Modifier.weight(1f)) {
+            ClassicColorPicker(Modifier.weight(1f), color = HsvColor.from(Color.Red)) {
                 inputColor = HSV(it.hue, it.saturation, it.value, it.alpha).toSRGB()
             }
 
@@ -62,7 +59,7 @@ fun testApplication() = CoroutineScope(Dispatchers.Default).launchApplication {
                     }
 
                     Column {
-                        Text("materialColor id = ${shade.materialColor.id}")
+                        Text("materialColor id = ${shade.mapColor.id}")
                         Text("brightness id = ${shade.brightness.id}")
                         Text("byte = ${shade.mapByte}")
                     }

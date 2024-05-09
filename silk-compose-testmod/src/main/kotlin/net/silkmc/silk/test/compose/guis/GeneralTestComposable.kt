@@ -13,10 +13,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import net.minecraft.world.level.material.MapColor
 import net.silkmc.silk.compose.color.toCompose
 import net.silkmc.silk.compose.icons.McIcons
 import net.silkmc.silk.compose.ui.McImage
-import net.minecraft.world.level.material.MaterialColor
 
 private val colorList = listOf(Color.Green, Color.Magenta, Color.Red, Color.Blue, Color.Yellow)
 
@@ -47,7 +47,7 @@ fun GeneralTestComposable() {
             space()
             Text("Amount of clicks: $clickCounter")
             space()
-            Button(onClick = {}, colors = ButtonDefaults.buttonColors(MaterialColor.WARPED_NYLIUM.toCompose())) {
+            Button(onClick = {}, colors = ButtonDefaults.buttonColors(MapColor.WARPED_NYLIUM.toCompose())) {
                 Text("DARK_AQUA / WARPED_NYLIUM looks like this")
             }
             space()

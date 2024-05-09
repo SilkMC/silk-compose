@@ -1,11 +1,10 @@
 package net.silkmc.silk.compose.color
 
 import com.github.ajalt.colormath.calculate.differenceCIE2000
-import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
 import com.github.ajalt.colormath.model.RGBInt
-import net.minecraft.world.level.material.MaterialColor
-import net.silkmc.silk.compose.mixin.MaterialColorAccessor
+import net.minecraft.world.level.material.MapColor
+import net.silkmc.silk.compose.mixin.MapColorAccessor
 
 private typealias ComposeColor = androidx.compose.ui.graphics.Color
 private typealias ColormathColor = com.github.ajalt.colormath.Color
@@ -19,26 +18,26 @@ object MaterialColorUtils {
      * Constant shades which are used very often.
      */
     object ConstantShades {
-        val transparent = MaterialColorShade(MaterialColor.NONE, MaterialColor.Brightness.LOW)
-        val white = MaterialColorShade(MaterialColor.SNOW, MaterialColor.Brightness.HIGH)
-        val nearlyBlack = MaterialColorShade(MaterialColor.COLOR_BLACK, MaterialColor.Brightness.LOWEST)
+        val transparent = MapColorShade(MapColor.NONE, MapColor.Brightness.LOW)
+        val white = MapColorShade(MapColor.SNOW, MapColor.Brightness.HIGH)
+        val nearlyBlack = MapColorShade(MapColor.COLOR_BLACK, MapColor.Brightness.LOWEST)
     }
 
     /**
      * A list of pre-calculated color shades. For each [MaterialColor], there
      * are 4 shades (for each [MaterialColor.Brightness]). See [MaterialColorShade].
      */
-    private val materialColorShades = MaterialColorAccessor.getMaterialColors()
+    private val materialColorShades = MapColorAccessor.getMaterialColors()
         .filter { it != null && it.col != 0 }
         .map { materialColor ->
-            MaterialColor.Brightness.values().map { brightness ->
-                MaterialColorShade(materialColor, brightness)
+            MapColor.Brightness.entries.map { brightness ->
+                MapColorShade(materialColor, brightness)
             }
         }
         .flatten()
 
     /**
-     * Scales the given [color] down to a [MaterialColor] using
+     * Scales the given [color] down to a [MapColor] using
      * [differenceCIE2000] and returns the [MaterialColorShade] instance
      * of that material color variant.
      *
@@ -48,7 +47,7 @@ object MaterialColorUtils {
         color: ColormathColor,
         smoothWhite: Boolean = true,
         smoothBlack: Boolean = true,
-    ): MaterialColorShade {
+    ): MapColorShade {
         val rgb = if (color is RGB) color else color.toSRGB()
 
         if (rgb.alpha <= 0.1f) {
@@ -80,7 +79,7 @@ object MaterialColorUtils {
  * Converts the non-shaded color value of this [MaterialColor] instance to
  * the Compose [Color] representation.
  */
-fun MaterialColor.toCompose(): ComposeColor {
+fun MapColor.toCompose(): ComposeColor {
     return RGBInt(col.toUInt()).run {
         androidx.compose.ui.graphics.Color(r.toInt(), g.toInt(), b.toInt())
     }
