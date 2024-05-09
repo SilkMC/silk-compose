@@ -1,5 +1,3 @@
-import com.modrinth.minotaur.TaskModrinthSyncBody
-import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.dependencies.DependencyType
 import com.modrinth.minotaur.dependencies.ModDependency
 

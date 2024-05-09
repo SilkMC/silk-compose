@@ -7,7 +7,8 @@ description = "Testmod for Silk Compose"
 
 dependencies {
     implementation(project(":${rootProject.name}", configuration = "developmentElements"))
-    modImplementation("net.silkmc:silk-commands:1.9.2")
+    modImplementation(Deps.Silk.commands)
 
-    implementation("com.godaddy.android.colorpicker:compose-color-picker-jvm:0.5.0")
+    implementation(Deps.ColorMath.jvm)
+    implementation(Deps.ColorPicker.jvm)
 }

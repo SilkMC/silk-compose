@@ -7,5 +7,5 @@ description = "Silk Compose Mojang API extracts Minecraft assets from the client
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation(Deps.KotlinX.Serialization.json)
 }

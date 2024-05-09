@@ -44,7 +44,7 @@ You can now have a look at the **UI** package (below) to see custom composable f
 ## Compose docs
 
 There are docs at [Android Developer Website](https://developer.android.com/jetpack/compose/documentation) and you can
-find desktop specific documentation at the [compose-jb](https://github.com/JetBrains/compose-jb) repository.
+find desktop specific documentation at the [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) repository.
 Additionally, there is a  [community maintained playground](https://foso.github.io/Jetpack-Compose-Playground/).
 For each Compose module, you can also find very useful API docs, e.g.
 [the ones for Material 3](https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary).

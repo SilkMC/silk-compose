@@ -2,8 +2,8 @@ import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6" apply false
-    id("org.jetbrains.compose") version "1.2.0-beta01" apply false
+    id(Deps.Ksp.plugin) version Deps.Ksp.version apply false
+    id("org.jetbrains.compose") version Deps.Compose.version apply false
     id("org.jetbrains.dokka")
 }
 
@@ -18,15 +18,15 @@ allprojects {
     group = "net.silkmc"
     version = "1.0.4"
 
-    description = "Silk Compose brings Kotlin compose-jb to Minecraft"
+    description = "Silk Compose brings Kotlin Compose Multiplatform to Minecraft"
 
     tasks {
         withType<JavaCompile> {
-            options.release.set(17)
+            options.release.set(21)
         }
         withType<KotlinCompile> {
             kotlinOptions {
-                jvmTarget = "17"
+                jvmTarget = "21"
                 freeCompilerArgs += listOf("-Xcontext-receivers", "-Xskip-prerelease-check")
             }
         }
