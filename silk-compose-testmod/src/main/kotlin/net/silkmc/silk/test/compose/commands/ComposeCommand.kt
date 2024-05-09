@@ -38,7 +38,7 @@ val composeCommand = command("compose") {
     literal("wheel") runs {
         source.playerOrException.displayComposable(
             4, 4,
-            backgroundColor = Color.White.copy(0f)
+            backgroundColor = Color.Transparent
         ) {
             RotatingWheel()
         }

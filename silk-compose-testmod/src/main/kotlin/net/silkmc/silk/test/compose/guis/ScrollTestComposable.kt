@@ -18,7 +18,6 @@ import kotlin.reflect.typeOf
 @Composable
 fun ScrollTestComposable() {
     val icons = McIcons.Item::class.declaredMemberProperties
-        .also(::println)
         .filter { it.isConst && it.returnType == typeOf<McIcon>() }
         .map { it.getter.call() as McIcon }
 
