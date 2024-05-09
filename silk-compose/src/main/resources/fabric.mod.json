@@ -11,7 +11,7 @@
     "silk-compose.mixins.json"
   ],
   "depends": {
-    "fabric": "*"
+    "silk-core": "*"
   },
   "contact": {
     "homepage": "${githubUrl}",

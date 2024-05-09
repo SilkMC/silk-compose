@@ -6,21 +6,21 @@ import com.github.ajalt.colormath.model.LAB
 import com.github.ajalt.colormath.model.RGB
 import com.github.ajalt.colormath.model.RGBInt
 import com.github.ajalt.colormath.transform.multiplyAlpha
-import net.minecraft.world.level.material.MaterialColor
+import net.minecraft.world.level.material.MapColor
 
 /**
- * A pre-calculated color shade of the [materialColor] with
+ * A pre-calculated color shade of the [mapColor] with
  * the given [brightness].
  */
-data class MaterialColorShade(
-    val materialColor: MaterialColor,
-    val brightness: MaterialColor.Brightness,
+data class MapColorShade(
+    val mapColor: MapColor,
+    val brightness: MapColor.Brightness,
 ) {
 
-    val rgb: RGB = if (materialColor == MaterialColor.NONE) {
+    val rgb: RGB = if (mapColor == MapColor.NONE) {
         RGB(1, 1, 1, 0)
     } else {
-        RGBInt(materialColor.col.toUInt()).toSRGB()
+        RGBInt(mapColor.col.toUInt()).toSRGB()
             .copy(alpha = brightness.modifier / 255f)
             .multiplyAlpha()
             .copy(alpha = 1f)
@@ -28,5 +28,17 @@ data class MaterialColorShade(
 
     val lab: LAB = rgb.toLAB()
 
-    val mapByte = (materialColor.id * 4 + brightness.id).toByte()
+    val mapByte = (mapColor.id * 4 + brightness.id).toByte()
+
+    @Deprecated(
+        message = "Minecraft has renamed MaterialColor to MapColor, therefore this property has been renamed to mapColor.",
+        replaceWith = ReplaceWith("mapColor", "net.silkmc.silk.compose.color.MapColorShade"),
+    )
+    val materialColor get() = mapColor
 }
+
+@Deprecated(
+    message = "Minecraft has renamed MaterialColor to MapColor, therefore this class has been renamed to MapColorShade.",
+    replaceWith = ReplaceWith("MapColorShade", "net.silkmc.silk.compose.color.MapColorShade"),
+)
+typealias MaterialColorShade = MapColorShade

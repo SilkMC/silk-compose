@@ -1,13 +1,14 @@
 package net.silkmc.silk.compose
 
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
+import net.minecraft.world.level.saveddata.maps.MapId
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData
 import net.silkmc.silk.compose.internal.MapIdGenerator
 import kotlin.math.max
 import kotlin.math.min
 
 internal class GuiChunk(
-    val mapId: Int = MapIdGenerator.nextId(),
+    val mapId: MapId = MapId(MapIdGenerator.nextId()),
     private val colors: ByteArray = ByteArray(128 * 128),
 ) {
     private var dirty = false
