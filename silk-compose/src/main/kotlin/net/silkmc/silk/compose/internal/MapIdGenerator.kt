@@ -1,29 +1,22 @@
 package net.silkmc.silk.compose.internal
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import net.silkmc.silk.core.task.silkCoroutineScope
-
 internal object MapIdGenerator {
-    private val mutex = Mutex()
+    // for now, use the top 100000 ids for fake maps
+    private var currentMaxId = Int.MAX_VALUE - 100_000
 
-    private var currentMaxId = Int.MAX_VALUE - 12000
-
+    // these are IDs which have been used before for fake maps
+    // and are now available for reuse
     private val availableOldIds = ArrayList<Int>()
 
-    fun nextId() = runBlocking {
-        mutex.withLock {
+    fun nextId(): Int {
+        return synchronized(this) {
             availableOldIds.removeFirstOrNull() ?: (++currentMaxId)
         }
     }
 
     fun makeOldIdsAvailable(ids: Collection<Int>) {
-        silkCoroutineScope.launch {
-            mutex.withLock {
-                availableOldIds.addAll(ids)
-            }
+        synchronized(this) {
+            availableOldIds.addAll(ids)
         }
     }
 }
