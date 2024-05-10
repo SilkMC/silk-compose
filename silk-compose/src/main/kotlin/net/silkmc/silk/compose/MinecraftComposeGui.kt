@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.scene.MultiLayerComposeScene
 import androidx.compose.ui.unit.IntSize
-import com.github.ajalt.colormath.model.SRGB
 import kotlinx.coroutines.*
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
@@ -25,7 +24,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
-import net.silkmc.silk.compose.color.MaterialColorUtils
+import net.silkmc.silk.compose.color.MapColorUtils
 import net.silkmc.silk.compose.internal.MapIdGenerator
 import net.silkmc.silk.compose.util.MathUtil
 import net.silkmc.silk.compose.util.MathUtil.toMkArray
@@ -92,8 +91,6 @@ class MinecraftComposeGui(
 
     companion object {
         private val playerGuis = ConcurrentHashMap<UUID, MinecraftComposeGui>()
-
-        private val bitmapToMapColorCache = ConcurrentHashMap<Int, Byte>()
 
         init {
             @OptIn(ExperimentalSilkApi::class)
@@ -250,7 +247,6 @@ class MinecraftComposeGui(
      * as it provides no invalidation mechanism, which is required for
      * updating the in-game gui.
      */
-    @OptIn(InternalComposeUiApi::class)
     private val scene = MultiLayerComposeScene(
         coroutineContext = singleThreadDispatcher,
         invalidate = { frameDispatcher.scheduleFrame() },
@@ -305,15 +301,6 @@ class MinecraftComposeGui(
         itemFrameEntityIds = entityIds
     }
 
-    private fun bitmapToMapColor(bitmapColor: Int): Byte {
-        return bitmapToMapColorCache.getOrPut(bitmapColor) {
-            val rgb = Color(bitmapColor)
-                .run { SRGB(red, green, blue, alpha) }
-
-            MaterialColorUtils.toMaterialColorId(rgb).mapByte
-        }
-    }
-
     private suspend fun updateMinecraftMaps() {
         nativeCanvas.clear(org.jetbrains.skia.Color.TRANSPARENT)
         scene.render(canvas, System.nanoTime())
@@ -330,7 +317,7 @@ class MinecraftComposeGui(
                         for (x in 0 until 128) {
                             for (y in 0 until 128) {
                                 val bitmapColor = pixmap.getColor(xFrame * 128 + x, yFrame * 128 + y)
-                                guiChunk.setColor(x, y, bitmapToMapColor(bitmapColor))
+                                guiChunk.setColor(x, y, MapColorUtils.cachedBitmapColorToMapColor(bitmapColor))
                             }
                         }
 

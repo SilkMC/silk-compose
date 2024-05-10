@@ -18,7 +18,7 @@ import com.godaddy.android.colorpicker.ClassicColorPicker
 import com.godaddy.android.colorpicker.HsvColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import net.silkmc.silk.compose.color.MaterialColorUtils
+import net.silkmc.silk.compose.color.MapColorUtils
 import net.silkmc.silk.test.compose.util.rememberBitmapResource
 
 private var inputColor by mutableStateOf(SRGB(0, 0, 0))
@@ -51,7 +51,7 @@ fun testApplication() = CoroutineScope(Dispatchers.Default).launchApplication {
 
                 Column {
                     val shade = remember(inputColor) {
-                        val converted = MaterialColorUtils.toMaterialColorId(inputColor)
+                        val converted = MapColorUtils.toMapColorShade(inputColor)
                         if (!converted.rgb.isInSRGBGamut()) {
                             println("nicht in der range!!!!")
                         }

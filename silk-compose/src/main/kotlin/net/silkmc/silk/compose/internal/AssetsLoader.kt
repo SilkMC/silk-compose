@@ -67,7 +67,6 @@ object AssetsLoader {
 
         return withContext(Dispatchers.IO) {
             try {
-                @Suppress("BlockingMethodInNonBlockingContext")
                 assetsPath.resolve("minecraft/textures/${icon}").inputStream().buffered().use(::loadImageBitmap)
             } catch (ignored: NoSuchFileException) {
                 logError("Cannot load or find image file for given icon: $icon")
