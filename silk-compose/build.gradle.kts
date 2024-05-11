@@ -89,6 +89,7 @@ kotlin {
         all {
             languageSettings {
                 optIn("net.silkmc.silk.core.annotations.DelicateSilkApi")
+                optIn("net.silkmc.silk.core.annotations.InternalSilkApi")
             }
         }
     }

@@ -1,10 +1,10 @@
 package net.silkmc.silk.compose.mixin;
 
-import net.silkmc.silk.compose.MinecraftComposeGui;
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ServerboundSwingPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.silkmc.silk.compose.impl.ItemFrameMapsComposeGui;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public class ServerGamePacketListenerImplMixin {
         at = @At("RETURN")
     )
     private void onHandSwingInject(ServerboundSwingPacket packet, CallbackInfo ci) {
-        MinecraftComposeGui.Companion.onSwingHand$silk_compose(player, packet);
+        ItemFrameMapsComposeGui.PlayerHolder.onSwingHand(player, packet);
     }
 
     @Inject(
@@ -36,7 +36,7 @@ public class ServerGamePacketListenerImplMixin {
         cancellable = true
     )
     private void onUpdateSelectedSlotInject(ServerboundSetCarriedItemPacket packet, CallbackInfo ci) {
-        if (MinecraftComposeGui.Companion.onUpdateSelectedSlot$silk_compose(player, packet)) {
+        if (ItemFrameMapsComposeGui.PlayerHolder.onUpdateSelectedSlot(player, packet)) {
             ci.cancel();
         }
     }
