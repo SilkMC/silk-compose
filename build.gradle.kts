@@ -16,7 +16,7 @@ allprojects {
     }
 
     group = "net.silkmc"
-    version = "1.0.4"
+    version = "1.1.0"
 
     description = "Silk Compose brings Kotlin Compose Multiplatform to Minecraft"
 

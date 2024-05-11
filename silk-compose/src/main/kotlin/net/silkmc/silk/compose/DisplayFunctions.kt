@@ -3,9 +3,14 @@ package net.silkmc.silk.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import net.minecraft.core.BlockPos
+import net.minecraft.core.component.DataComponents
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.silkmc.silk.compose.impl.AbstractComposeGui
 import net.silkmc.silk.compose.impl.ItemFrameMapsComposeGui
+import net.silkmc.silk.compose.impl.SingleMapComposeGui
+import net.silkmc.silk.core.annotations.ExperimentalSilkApi
 
 
 /**
@@ -33,4 +38,20 @@ fun ServerPlayer.displayComposable(
         player = this,
         position = position,
     )
+}
+
+@ExperimentalSilkApi
+fun ItemStack.displayComposableToFilledMap(
+    player: ServerPlayer,
+    backgroundColor: Color = Color.White,
+    content: @Composable (gui: AbstractComposeGui) -> Unit,
+): AbstractComposeGui? {
+    if (item != Items.FILLED_MAP) return null
+    val gui = SingleMapComposeGui(
+        content,
+        backgroundColor,
+        player = player,
+    )
+    set(DataComponents.MAP_ID, gui.mapId)
+    return gui
 }

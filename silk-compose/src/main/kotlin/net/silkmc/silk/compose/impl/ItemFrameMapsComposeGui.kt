@@ -213,9 +213,11 @@ class ItemFrameMapsComposeGui(
                     launch(Dispatchers.Default) {
                         val guiChunk = getGuiChunk(xFrame, yFrame)
 
-                        for (x in 0 until 128) {
-                            for (y in 0 until 128) {
-                                val bitmapColor = pixmap.getColor(xFrame * 128 + x, yFrame * 128 + y)
+                        for (x in 0 until Constants.mapPixelSize) {
+                            for (y in 0 until Constants.mapPixelSize) {
+                                val bitmapColor = pixmap.getColor(
+                                    x = xFrame * Constants.mapPixelSize + x,
+                                    y = yFrame * Constants.mapPixelSize + y)
                                 guiChunk.setColor(x, y, MapColorUtils.cachedBitmapColorToMapColor(bitmapColor))
                             }
                         }
@@ -260,7 +262,7 @@ class ItemFrameMapsComposeGui(
             else -> return null
         }
 
-        return Offset((planeX * 128).toFloat(), (planeY * 128).toFloat())
+        return Offset((planeX * Constants.mapPixelSize).toFloat(), (planeY * Constants.mapPixelSize).toFloat())
     }
 
     private fun onLeftClick() {
