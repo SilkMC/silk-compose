@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import net.silkmc.silk.compose.MinecraftComposeGui
+import net.silkmc.silk.compose.impl.AbstractComposeGui
 
 /**
  * Adds an opinionated window header suitable for [MinecraftComposeGui]s. This
@@ -28,7 +28,7 @@ import net.silkmc.silk.compose.MinecraftComposeGui
  * @param title the current title of the gui
  */
 @Composable
-fun McWindowHeader(gui: MinecraftComposeGui, title: String = "") {
+fun McWindowHeader(gui: AbstractComposeGui, title: String = "") {
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

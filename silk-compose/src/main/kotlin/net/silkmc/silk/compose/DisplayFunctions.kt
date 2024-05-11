@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
+import net.silkmc.silk.compose.impl.AbstractComposeGui
 import net.silkmc.silk.compose.impl.ItemFrameMapsComposeGui
 
 
@@ -23,8 +24,8 @@ fun ServerPlayer.displayComposable(
     blockWidth: Int, blockHeight: Int,
     position: BlockPos = blockPosition().relative(direction, 2),
     backgroundColor: Color = Color.White,
-    content: @Composable (gui: MinecraftComposeGui) -> Unit,
-): MinecraftComposeGui {
+    content: @Composable (gui: AbstractComposeGui) -> Unit,
+): AbstractComposeGui {
     return ItemFrameMapsComposeGui(
         content,
         backgroundColor,

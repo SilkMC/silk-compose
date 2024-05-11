@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package net.silkmc.silk.compose
+package net.silkmc.silk.compose.impl
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,8 +30,8 @@ import kotlin.time.Duration.Companion.seconds
  * each change to the UI.
  */
 @OptIn(InternalComposeUiApi::class)
-abstract class MinecraftComposeGui(
-    val content: @Composable (gui: MinecraftComposeGui) -> Unit,
+abstract class AbstractComposeGui(
+    val content: @Composable (gui: AbstractComposeGui) -> Unit,
     val backgroundColor: Color,
     val pixelWidth: Int,
     val pixelHeight: Int,
@@ -113,7 +113,7 @@ abstract class MinecraftComposeGui(
         coroutineScope.launch {
             scene.setContent {
                 Box(Modifier.fillMaxSize().background(backgroundColor)) {
-                    content(this@MinecraftComposeGui)
+                    content(this@AbstractComposeGui)
                 }
             }
         }

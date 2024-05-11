@@ -18,7 +18,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
 import net.silkmc.silk.compose.GuiChunk
-import net.silkmc.silk.compose.MinecraftComposeGui
 import net.silkmc.silk.compose.color.MapColorUtils
 import net.silkmc.silk.compose.displayComposable
 import net.silkmc.silk.compose.internal.MapIdGenerator
@@ -49,12 +48,12 @@ import java.util.concurrent.ConcurrentHashMap
 @OptIn(InternalComposeUiApi::class)
 @InternalSilkApi
 class ItemFrameMapsComposeGui(
-    content: @Composable (gui: MinecraftComposeGui) -> Unit,
+    content: @Composable (gui: AbstractComposeGui) -> Unit,
     backgroundColor: Color,
     val blockWidth: Int, val blockHeight: Int,
     val player: ServerPlayer,
     val position: BlockPos,
-) : MinecraftComposeGui(
+) : AbstractComposeGui(
     content = content,
     backgroundColor = backgroundColor,
     pixelWidth = blockWidth * Constants.mapPixelSize,
