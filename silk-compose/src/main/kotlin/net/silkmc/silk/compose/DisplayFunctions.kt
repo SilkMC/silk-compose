@@ -40,6 +40,14 @@ fun ServerPlayer.displayComposable(
     )
 }
 
+/**
+ * Creates a new server-side [MinecraftComposeGui]. This allows you to use any
+ * composable functions inside the [content] lambda of this function.
+ *
+ * @param player the player that will receive the map
+ * @param backgroundColor the background color of the gui, can be transparent as well
+ * @param content define your gui using composable functions in here
+ */
 @ExperimentalSilkApi
 fun ItemStack.displayComposableToFilledMap(
     player: ServerPlayer,
@@ -50,8 +58,8 @@ fun ItemStack.displayComposableToFilledMap(
     val gui = SingleMapComposeGui(
         content,
         backgroundColor,
-        player = player,
     )
     set(DataComponents.MAP_ID, gui.mapId)
+    gui.displayTo(player)
     return gui
 }

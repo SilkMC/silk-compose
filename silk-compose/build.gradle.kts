@@ -1,3 +1,5 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
+
 plugins {
     `mod-build-script`
     `project-publish-script`
@@ -31,9 +33,11 @@ dependencies {
     includeTransitive(implementation(Deps.KotlinX.MultiK.jvm)!!)
     includeTransitive(implementation(Deps.ColorMath.jvm)!!)
 
+    @OptIn(ExperimentalComposeLibrary::class)
     listOf(
         compose.desktop.common,
         compose.material3,
+        compose.desktop.components.animatedImage,
     ).forEach {
         includeTransitive(api(it)!!)
     }

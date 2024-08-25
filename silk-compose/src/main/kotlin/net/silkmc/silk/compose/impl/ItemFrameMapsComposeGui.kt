@@ -8,7 +8,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
@@ -20,7 +19,6 @@ import net.minecraft.world.item.Items
 import net.silkmc.silk.compose.GuiChunk
 import net.silkmc.silk.compose.color.MapColorUtils
 import net.silkmc.silk.compose.displayComposable
-import net.silkmc.silk.compose.internal.MapIdGenerator
 import net.silkmc.silk.compose.util.Constants
 import net.silkmc.silk.compose.util.MathUtil
 import net.silkmc.silk.compose.util.MathUtil.toMkArray
@@ -31,7 +29,6 @@ import net.silkmc.silk.core.event.Events
 import net.silkmc.silk.core.event.Player
 import net.silkmc.silk.core.event.Server
 import net.silkmc.silk.core.item.itemStack
-import net.silkmc.silk.core.text.sendText
 import org.jetbrains.skia.Pixmap
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -45,22 +42,23 @@ import java.util.concurrent.ConcurrentHashMap
  * the server.
  * If you want to remove this gui, call the [close] function.
  */
+@Suppress("UNCHECKED_CAST")
 @OptIn(InternalComposeUiApi::class)
 @InternalSilkApi
 class ItemFrameMapsComposeGui(
     content: @Composable (gui: AbstractComposeGui) -> Unit,
     backgroundColor: Color,
     val blockWidth: Int, val blockHeight: Int,
-    val player: ServerPlayer,
-    val position: BlockPos,
+    val position: BlockPos, direction: Direction,
 ) : AbstractComposeGui(
     content = content,
     backgroundColor = backgroundColor,
     pixelWidth = blockWidth * Constants.mapPixelSize,
     pixelHeight = blockHeight * Constants.mapPixelSize,
+    playerGuiRegistry = playerGuis as MutableMap<UUID, AbstractComposeGui>,
 ) {
     override val logName: String
-        get() = "item frame gui for ${player.gameProfile.name}"
+        get() = "item frame gui at ${position.toShortString()}"
 
     @InternalSilkApi
     companion object PlayerHolder {
@@ -82,7 +80,7 @@ class ItemFrameMapsComposeGui(
         @JvmStatic
         fun onSwingHand(player: ServerPlayer, packet: ServerboundSwingPacket) {
             if (packet.hand == InteractionHand.MAIN_HAND) {
-                playerGuis[player.uuid]?.onLeftClick()
+                playerGuis[player.uuid]?.onLeftClick(player)
             }
         }
 
@@ -101,11 +99,11 @@ class ItemFrameMapsComposeGui(
                 else -> return false
             }
 
-            return gui.onScroll(scrollDelta * 3)
+            return gui.onScroll(player, scrollDelta * 3)
         }
     }
 
-    private val guiDirection = player.direction.opposite
+    private val guiDirection = direction
     private val placementDirection = guiDirection.getCounterClockWise(Direction.Axis.Y)
 
     /**
@@ -148,7 +146,11 @@ class ItemFrameMapsComposeGui(
      * The gui is divided into chunks of 128x128 pixels. Each chunk has its own
      * [GuiChunk] which is used for updating exactly one specific map.
      */
-    private val guiChunks = Array(blockWidth * blockHeight) { GuiChunk() }
+    override val guiChunks = buildList {
+        repeat(blockWidth * blockHeight) {
+            add(GuiChunk())
+        }
+    }
     private fun getGuiChunk(x: Int, y: Int) = guiChunks[x + y * blockWidth]
 
     /**
@@ -161,21 +163,12 @@ class ItemFrameMapsComposeGui(
     private var itemFrameEntityIds: Set<Int> = emptySet()
 
 
-    init {
-        playerGuis[player.uuid]?.close()
-        playerGuis[player.uuid] = this
-
-        coroutineScope.launch {
-            createFakeItemFrames()
-        }
-    }
-
     /**
      * Sends packets to the player to create the item frames and the maps inside them.
      * Also sends the initial empty map data to the player.
      * This function is called when the gui is opened.
      */
-    private fun createFakeItemFrames() {
+    private fun createFakeItemFrames(player: ServerPlayer) {
         val entityIds = HashSet<Int>(blockWidth * blockHeight)
         for (xFrame in 0 until blockWidth) {
             for (yFrame in 0 until blockHeight) {
@@ -222,10 +215,8 @@ class ItemFrameMapsComposeGui(
                             }
                         }
 
-                        val updatePacket = guiChunk.createUpdatePacket()
-                        if (updatePacket != null) {
-                            player.connection.send(updatePacket)
-                        }
+                        guiChunk.createUpdatePacket()
+                            ?.let { pack -> players.forEach { it.connection.send(pack) } }
                     }
                 }
             }
@@ -237,7 +228,7 @@ class ItemFrameMapsComposeGui(
      * If the intersection is within the bounds of the gui, return the offset of the intersection
      * as gui coordinates.
      */
-    private fun calculatePlayerOffset(): Offset? {
+    private fun calculatePlayerOffset(player: ServerPlayer): Offset? {
         val intersection = MathUtil.rayPlaneIntersection(
             player.eyePosition.toMkArray(),
             player.lookAngle.toMkArray(),
@@ -265,8 +256,8 @@ class ItemFrameMapsComposeGui(
         return Offset((planeX * Constants.mapPixelSize).toFloat(), (planeY * Constants.mapPixelSize).toFloat())
     }
 
-    private fun onLeftClick() {
-        val offset = calculatePlayerOffset() ?: return
+    private fun onLeftClick(player: ServerPlayer) {
+        val offset = calculatePlayerOffset(player) ?: return
 
         coroutineScope.launch {
             // ensure that the following press-release combo is in correct order, therefore release
@@ -277,8 +268,8 @@ class ItemFrameMapsComposeGui(
         }
     }
 
-    private fun onScroll(delta: Float): Boolean {
-        val offset = calculatePlayerOffset() ?: return false
+    private fun onScroll(player: ServerPlayer, delta: Float): Boolean {
+        val offset = calculatePlayerOffset(player) ?: return false
 
         // only reset the slot if the player is directly looking at the gui
         player.connection.send(ClientboundSetCarriedItemPacket(4))
@@ -290,27 +281,16 @@ class ItemFrameMapsComposeGui(
         return true
     }
 
-    override fun beforeClose() {
-        super.beforeClose()
-        playerGuis.remove(player.uuid, this)
+    override fun displayTo(player: ServerPlayer) {
+        super.displayTo(player)
+        coroutineScope.launch {
+            createFakeItemFrames(player)
+        }
+    }
+
+    override fun removeFor(player: ServerPlayer) {
         // visually remove the item frames
         player.connection.send(ClientboundRemoveEntitiesPacket(*itemFrameEntityIds.toIntArray()))
-    }
-
-    override fun afterClose() {
-        super.afterClose()
-        for (chunk in guiChunks) {
-            if (!player.hasDisconnected()) {
-                // clear the map (there is no map removal packet)
-                player.connection.send(chunk.createClearPacket())
-            }
-        }
-        MapIdGenerator.makeOldIdsAvailable(guiChunks.map { it.mapId.id })
-    }
-
-    override fun onException(throwable: Throwable) {
-        super.onException(throwable)
-        player.sendText("The gui you had open has been closed due to an internal error.") {
-            color = ChatFormatting.RED.color }
+        super.removeFor(player)
     }
 }

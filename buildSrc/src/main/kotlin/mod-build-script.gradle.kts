@@ -14,6 +14,16 @@ dependencies {
     excludedDeps(modImplementation(Deps.Fabric.kotlin)!!)
 }
 
-configurations.namedElements {
-    attributes.attribute(Attribute.of("temp_disambiguation", String::class.java), "temp_value")
+configurations {
+    namedElements {
+        attributes {
+            attribute(Attribute.of("temp_disambiguation", String::class.java), "temp_value")
+        }
+    }
+
+    all {
+        attributes {
+            attribute(Attribute.of("ui", String::class.java), "awt")
+        }
+    }
 }

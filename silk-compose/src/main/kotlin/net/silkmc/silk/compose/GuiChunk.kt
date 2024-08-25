@@ -42,7 +42,7 @@ class GuiChunk(
 
 
     fun createFullPacket(): ClientboundMapItemDataPacket {
-        val updateData = MapItemSavedData.MapPatch(0, 0, MAP_SIZE, MAP_SIZE, colors)
+        val updateData = MapItemSavedData.MapPatch(0, 0, MAP_SIZE, MAP_SIZE, colors.copyOf())
         return createDataPacket(updateData)
     }
 

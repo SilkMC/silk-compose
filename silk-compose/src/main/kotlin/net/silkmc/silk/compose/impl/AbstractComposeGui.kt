@@ -13,14 +13,20 @@ import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.scene.MultiLayerComposeScene
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.*
+import net.minecraft.ChatFormatting
+import net.minecraft.server.level.ServerPlayer
+import net.silkmc.silk.compose.GuiChunk
+import net.silkmc.silk.compose.internal.MapIdGenerator
 import net.silkmc.silk.core.logging.logError
 import net.silkmc.silk.core.logging.logWarning
 import net.silkmc.silk.core.task.mcCoroutineScope
 import net.silkmc.silk.core.task.silkCoroutineScope
+import net.silkmc.silk.core.text.sendText
 import org.jetbrains.skia.Pixmap
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.MainUIDispatcher
+import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -35,6 +41,7 @@ abstract class AbstractComposeGui(
     val backgroundColor: Color,
     val pixelWidth: Int,
     val pixelHeight: Int,
+    private val playerGuiRegistry: MutableMap<UUID, AbstractComposeGui>,
 ) {
     /**
      * The name with which this gui will appear in log messages.
@@ -109,6 +116,16 @@ abstract class AbstractComposeGui(
     )
 
 
+    /**
+     * A set of players that have this gui open. This set is used to close
+     * the gui for all players when the gui is closed and to send updates
+     * to all players.
+     */
+    protected val players: MutableSet<ServerPlayer> = Collections.synchronizedSet(HashSet())
+
+    abstract val guiChunks: List<GuiChunk>
+
+
     init {
         coroutineScope.launch {
             scene.setContent {
@@ -181,7 +198,9 @@ abstract class AbstractComposeGui(
     }
 
     protected open fun beforeClose() { }
-    protected open fun afterClose() { }
+    protected open fun afterClose() {
+        MapIdGenerator.makeOldIdsAvailable(guiChunks.map { it.mapId.id })
+    }
 
     protected open fun onException(throwable: Throwable) {
         logError(buildString {
@@ -190,6 +209,27 @@ abstract class AbstractComposeGui(
             append(throwable.stackTraceToString())
         })
         logWarning("Closing gui '$logName'")
+        val closePlayers = players.toList()
         close()
+        for (player in closePlayers) {
+            player.sendText("The gui you had open has been closed due to an internal error.") {
+                color = ChatFormatting.RED.color }
+        }
+    }
+
+    open fun displayTo(player: ServerPlayer) {
+        playerGuiRegistry[player.uuid]?.removeFor(player)
+        playerGuiRegistry[player.uuid] = this
+    }
+
+    open fun removeFor(player: ServerPlayer) {
+        players.remove(player)
+        playerGuiRegistry.remove(player.uuid)
+        for (chunk in guiChunks) {
+            if (!player.hasDisconnected()) {
+                // clear the map (there is no map removal packet)
+                player.connection.send(chunk.createClearPacket())
+            }
+        }
     }
 }
