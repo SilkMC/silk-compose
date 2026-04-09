@@ -1,18 +1,18 @@
 val githubRepo = "SilkMC/silk-compose"
-val minecraftVersion = "1.20.6"
+val minecraftVersion = "26.1"
 
 object Deps {
     // https://fabricmc.net/develop/
     // https://jakobk.net/mcdev
     object Fabric {
         val minecraft = "com.mojang:minecraft:$minecraftVersion"
-        val loader = "net.fabricmc:fabric-loader:0.15.10"
-        val kotlin = "net.fabricmc:fabric-language-kotlin:1.10.19+kotlin.1.9.23"
+        val loader = "net.fabricmc:fabric-loader:0.19.0"
+        val kotlin = "net.fabricmc:fabric-language-kotlin:1.13.10+kotlin.2.3.20"
     }
 
     // https://github.com/SilkMC/silk
     object Silk {
-        val silkVersion = "1.10.5"
+        val silkVersion = "1.11.6"
         val core = "net.silkmc:silk-core:$silkVersion"
         val commands = "net.silkmc:silk-commands:$silkVersion"
     }
@@ -25,34 +25,34 @@ object Deps {
         }
         // https://github.com/Kotlin/kotlinx.serialization
         object Serialization {
-            val version = "1.6.3"
+            val version = "1.10.0"
             val json = "org.jetbrains.kotlinx:kotlinx-serialization-json:$version"
         }
     }
 
     // https://github.com/JetBrains/compose-multiplatform
     object Compose {
-        val version = "1.6.10-rc01"
+        val version = "1.10.3"
     }
 
     // https://github.com/ajalt/colormath
     object ColorMath {
-        val version = "3.5.0"
+        val version = "3.6.1"
         val jvm = "com.github.ajalt.colormath:colormath-jvm:$version"
     }
 
     // https://github.com/google/ksp
     object Ksp {
-        val version = "1.9.23-1.0.20"
+        val version = "2.3.6"
         val plugin = "com.google.devtools.ksp"
         val symbolProcessingApi = "com.google.devtools.ksp:symbol-processing-api:$version"
         // https://square.github.io/kotlinpoet/interop-ksp/
-        val kotlinPoetExtension = "com.squareup:kotlinpoet-ksp:1.16.0"
+        val kotlinPoetExtension = "com.squareup:kotlinpoet-ksp:2.3.0"
     }
 
     object Logging {
         // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-        val slf4jSimple = "org.slf4j:slf4j-simple:1.7.36"
+        val slf4jSimple = "org.slf4j:slf4j-simple:2.0.17"
     }
 
     // https://github.com/godaddy/compose-color-picker

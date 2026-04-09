@@ -11,24 +11,24 @@ repositories {
     gradlePluginPortal()
     maven("https://maven.fabricmc.net/")
     maven("https://maven.quiltmc.org/repository/release")
-    maven("https://server.bbkr.space/artifactory/libs-release/")
+    maven("https://repo.pauli.fyi/releases")
 }
 
 dependencies {
     fun pluginDep(id: String, version: String) = "${id}:${id}.gradle.plugin:${version}"
 
-    val kotlinVersion = "1.9.23"
+    val kotlinVersion = "2.3.20"
 
     compileOnly(kotlin("gradle-plugin", embeddedKotlinVersion))
     runtimeOnly(kotlin("gradle-plugin", kotlinVersion))
     compileOnly(pluginDep("org.jetbrains.kotlin.plugin.serialization", embeddedKotlinVersion))
     runtimeOnly(pluginDep("org.jetbrains.kotlin.plugin.serialization", kotlinVersion))
 
-    implementation(pluginDep("fabric-loom", "1.6-SNAPSHOT"))
-    implementation(pluginDep("com.modrinth.minotaur", "2.8.7"))
+    implementation(pluginDep("net.fabricmc.fabric-loom", "1.15-SNAPSHOT"))
+    implementation(pluginDep("com.modrinth.minotaur", "2.9.0"))
 
-    val compileDokkaVersion = "1.9.20"
-    val dokkaVersion = "1.9.20"
+    val compileDokkaVersion = "2.2.0"
+    val dokkaVersion = "2.2.0"
 
     compileOnly("org.jetbrains.dokka:dokka-gradle-plugin:$compileDokkaVersion")
     runtimeOnly("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")

@@ -1,4 +1,4 @@
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,6 +13,7 @@ allprojects {
         google()
         maven("https://androidx.dev/storage/compose-compiler/repository")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://repo.pauli.fyi/releases")
     }
 
     group = "net.silkmc"
@@ -22,19 +23,21 @@ allprojects {
 
     tasks {
         withType<JavaCompile> {
-            options.release.set(21)
+            options.release.set(25)
         }
         withType<KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "21"
-                freeCompilerArgs += listOf("-Xcontext-receivers", "-Xskip-prerelease-check")
+            compilerOptions {
+                jvmTarget = JvmTarget.JVM_25
+                freeCompilerArgs.addAll("-Xcontext-parameters")
             }
         }
     }
 
-    configurations.all {
-        attributes {
-            attribute(Attribute.of("ui", String::class.java), "awt")
+    configurations.configureEach {
+        if (isCanBeResolved || isCanBeConsumed) {
+            attributes {
+                attribute(Attribute.of("ui", String::class.java), "awt")
+            }
         }
     }
 }
@@ -42,7 +45,9 @@ allprojects {
 extra["kotlin.code.style"] = "official"
 
 tasks {
-    withType<DokkaMultiModuleTask> {
-        includes.from("dokka/includes/main.md")
+    dokka {
+        dokkaSourceSets.configureEach {
+            includes.from("dokka/includes/main.md")
+        }
     }
 }

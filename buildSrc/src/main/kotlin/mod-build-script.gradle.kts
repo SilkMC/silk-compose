@@ -1,19 +1,16 @@
 plugins {
     kotlin("jvm")
-    id("fabric-loom")
+    id("net.fabricmc.fabric-loom")
 }
 
 val excludedDeps: Configuration by configurations.creating
 
 dependencies {
     minecraft(Deps.Fabric.minecraft)
-    mappings(loom.layered {
-        officialMojangMappings()
-    })
-    excludedDeps(modImplementation(Deps.Fabric.loader)!!)
-    excludedDeps(modImplementation(Deps.Fabric.kotlin)!!)
+    excludedDeps(implementation(Deps.Fabric.loader)!!)
+    excludedDeps(implementation(Deps.Fabric.kotlin)!!)
 }
-
-configurations.namedElements {
-    attributes.attribute(Attribute.of("temp_disambiguation", String::class.java), "temp_value")
+// Disambiguate consumable configurations for Gradle 9.4+ compatibility
+configurations.archives {
+    attributes.attribute(Attribute.of("temp_disambiguation", String::class.java), "archives")
 }

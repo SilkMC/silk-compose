@@ -1,6 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import java.net.URL
-
 plugins {
     id("org.jetbrains.dokka")
 }
@@ -23,29 +20,25 @@ tasks {
         expand(properties)
     }
 
-    withType<DokkaTaskPartial> {
-        dependsOn(processDokkaMarkdown)
+    dokka {
+        dokkaSourceSets.configureEach {
+            includes.from(
+                buildDir.resolve("docs-markdown").listFiles()!!
+                    .sortedBy { if (it.name == "Module.md") "0" else it.name }
+                    .map { "build/docs-markdown/${it.name}" }
+                    .toTypedArray()
+            )
 
-        dokkaSourceSets {
-            configureEach {
-                includes.from(
-                    buildDir.resolve("docs-markdown").listFiles()!!
-                        .sortedBy { if (it.name == "Module.md") "0" else it.name }
-                        .map { "build/docs-markdown/${it.name}" }
-                        .toTypedArray()
-                )
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl("https://github.com/$githubRepo/tree/main/src/main/kotlin")
+                remoteLineSuffix.set("#L")
+            }
 
-                sourceLink {
-                    localDirectory.set(file("src/main/kotlin"))
-                    remoteUrl.set(URL("https://github.com/$githubRepo/tree/main/src/main/kotlin"))
-                    remoteLineSuffix.set("#L")
-                }
-
-                listOf("internal", "mixin").forEach {
-                    perPackageOption {
-                        matchingRegex.set(""".*\.$it.*""")
-                        suppress.set(true)
-                    }
+            listOf("internal", "mixin").forEach {
+                perPackageOption {
+                    matchingRegex.set(""".*\.$it.*""")
+                    suppress.set(true)
                 }
             }
         }

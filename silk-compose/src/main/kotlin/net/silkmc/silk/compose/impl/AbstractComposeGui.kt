@@ -10,7 +10,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.scene.MultiLayerComposeScene
+import androidx.compose.ui.scene.CanvasLayersComposeScene
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.*
 import net.silkmc.silk.core.logging.logError
@@ -102,7 +102,7 @@ abstract class AbstractComposeGui(
      * as it provides no invalidation mechanism, which is required for
      * updating the in-game gui.
      */
-    protected val scene = MultiLayerComposeScene(
+    protected val scene = CanvasLayersComposeScene(
         coroutineContext = singleThreadDispatcher,
         invalidate = { frameDispatcher.scheduleFrame() },
         size = IntSize(pixelWidth, pixelHeight),

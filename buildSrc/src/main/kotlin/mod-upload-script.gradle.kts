@@ -15,7 +15,7 @@ modrinth {
     gameVersions.set(listOf(minecraftVersion))
     loaders.set(listOf("fabric"))
 
-    uploadFile.set(tasks.remapJar.get())
+    uploadFile.set(tasks.jar.get())
 
     dependencies.set(
         listOf(
