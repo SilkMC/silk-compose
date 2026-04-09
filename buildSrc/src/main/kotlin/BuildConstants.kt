@@ -23,6 +23,7 @@ object Deps {
             val version = "0.2.3"
             val jvm = "org.jetbrains.kotlinx:multik-default-jvm:$version"
         }
+
         // https://github.com/Kotlin/kotlinx.serialization
         object Serialization {
             val version = "1.10.0"
@@ -46,6 +47,7 @@ object Deps {
         val version = "2.3.6"
         val plugin = "com.google.devtools.ksp"
         val symbolProcessingApi = "com.google.devtools.ksp:symbol-processing-api:$version"
+
         // https://square.github.io/kotlinpoet/interop-ksp/
         val kotlinPoetExtension = "com.squareup:kotlinpoet-ksp:2.3.0"
     }

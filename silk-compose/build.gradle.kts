@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     `mod-build-script`
     `project-publish-script`
