@@ -53,3 +53,10 @@ publishing {
 signing {
     sign(publishing.publications)
 }
+
+// Disambiguate the 'signatures' configuration for Gradle 9.4+ compatibility
+configurations.matching { it.name == "signatures" }.configureEach {
+    attributes {
+        attribute(Attribute.of("signing", String::class.java), "true")
+    }
+}
