@@ -1,7 +1,7 @@
 plugins {
     `mod-build-script`
     id("org.jetbrains.compose")
-    kotlin("plugin.compose") version "2.3.20"
+    kotlin("plugin.compose") version "2.4.20"
 }
 
 description = "Testmod for Silk Compose"

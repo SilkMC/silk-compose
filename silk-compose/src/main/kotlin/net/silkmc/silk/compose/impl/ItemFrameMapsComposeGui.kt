@@ -12,9 +12,9 @@ import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.TextColor
 import net.minecraft.network.protocol.game.*
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
 import net.silkmc.silk.compose.GuiChunk
@@ -80,17 +80,15 @@ class ItemFrameMapsComposeGui(
         }
 
         @JvmStatic
-        fun onSwingHand(player: ServerPlayer, packet: ServerboundSwingPacket) {
-            if (packet.hand == InteractionHand.MAIN_HAND) {
-                playerGuis[player.uuid]?.onLeftClick()
-            }
+        fun onSwingHand(player: ServerPlayer) {
+            playerGuis[player.uuid]?.onLeftClick()
         }
 
         @JvmStatic
-        fun onUpdateSelectedSlot(player: ServerPlayer, packet: ServerboundSetCarriedItemPacket): Boolean {
+        fun onUpdateSelectedSlot(player: ServerPlayer, newSlot: Int): Boolean {
             val gui = playerGuis[player.uuid] ?: return false
 
-            val slotPair = player.inventory.selectedSlot to packet.slot
+            val slotPair = player.inventory.selectedSlot to newSlot
             val (prevSlot, newSlot) = slotPair
 
             val scrollDelta = when {
@@ -315,7 +313,7 @@ class ItemFrameMapsComposeGui(
     override fun onException(throwable: Throwable) {
         super.onException(throwable)
         player.sendText("The gui you had open has been closed due to an internal error.") {
-            color = ChatFormatting.RED.color
+            color = TextColor.fromLegacyFormat(ChatFormatting.RED)!!.value
         }
     }
 }

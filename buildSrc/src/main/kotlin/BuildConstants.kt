@@ -1,18 +1,18 @@
 val githubRepo = "SilkMC/silk-compose"
-val minecraftVersion = "26.1"
+val minecraftVersion = "26.3"
 
 object Deps {
     // https://fabricmc.net/develop/
     // https://jakobk.net/mcdev
     object Fabric {
         val minecraft = "com.mojang:minecraft:$minecraftVersion"
-        val loader = "net.fabricmc:fabric-loader:0.19.0"
-        val kotlin = "net.fabricmc:fabric-language-kotlin:1.13.10+kotlin.2.3.20"
+        val loader = "net.fabricmc:fabric-loader:0.19.5"
+        val kotlin = "net.fabricmc:fabric-language-kotlin:1.14.1+kotlin.2.4.20"
     }
 
     // https://github.com/SilkMC/silk
     object Silk {
-        val silkVersion = "1.11.6"
+        val silkVersion = "1.12.1-paper"
         val core = "net.silkmc:silk-core:$silkVersion"
         val commands = "net.silkmc:silk-commands:$silkVersion"
     }
