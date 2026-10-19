@@ -15,6 +15,9 @@ val includeTransitive: Configuration by configurations.creating {
 
 val excludedDeps: Configuration by configurations.getting
 
+// the same dependencies fabric gets via include, silk-compose-paper bundles them into its jar
+val bundledDeps by extra(mutableListOf<String>())
+
 // workaround for project dependencies on this module (needed for the testmod)
 // adding compileOnly here is a workaround for a different issue where includes won't get loaded
 configurations {
@@ -58,6 +61,7 @@ dependencies {
         if (!excludedModules.contains(id.group to id.name)) {
             println("Including $id")
             include(id.toString())
+            bundledDeps += id.toString()
         }
     }
 }

@@ -12,6 +12,7 @@ repositories {
     maven("https://maven.fabricmc.net/")
     maven("https://maven.quiltmc.org/repository/release")
     maven("https://repo.pauli.fyi/releases")
+    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
@@ -26,6 +27,9 @@ dependencies {
 
     implementation(pluginDep("net.fabricmc.fabric-loom", "1.15-SNAPSHOT"))
     implementation(pluginDep("com.modrinth.minotaur", "2.9.0"))
+
+    implementation(pluginDep("io.papermc.paperweight.userdev", "2.0.0-beta.23"))
+    implementation(pluginDep("xyz.jpenilla.run-paper", "3.1.0"))
 
     val compileDokkaVersion = "2.2.0"
     val dokkaVersion = "2.2.0"

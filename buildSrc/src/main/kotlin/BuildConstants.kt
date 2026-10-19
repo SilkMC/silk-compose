@@ -15,6 +15,7 @@ object Deps {
         val silkVersion = "1.12.1-paper"
         val core = "net.silkmc:silk-core:$silkVersion"
         val commands = "net.silkmc:silk-commands:$silkVersion"
+        val paper = "net.silkmc:silk-paper:$silkVersion"
     }
 
     object KotlinX {
