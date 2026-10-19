@@ -5,7 +5,6 @@ import com.github.ajalt.colormath.model.RGB
 import com.github.ajalt.colormath.model.RGBInt
 import com.github.ajalt.colormath.model.SRGB
 import net.minecraft.world.level.material.MapColor
-import net.silkmc.silk.compose.mixin.MapColorAccessor
 import java.util.concurrent.ConcurrentHashMap
 
 private typealias ComposeColor = androidx.compose.ui.graphics.Color
@@ -49,8 +48,9 @@ object MapColorUtils {
      * A list of pre-calculated color shades. For each [MaterialColor], there
      * are 4 shades (for each [MaterialColor.Brightness]). See [MaterialColorShade].
      */
-    private val materialColorShades = MapColorAccessor.getMaterialColors()
-        .filter { it != null && it.col != 0 }
+    // ponytail: 64 = size of MapColor.MATERIAL_COLORS, byId maps empty ids to NONE (col 0)
+    private val materialColorShades = (0 until 64).map(MapColor::byId)
+        .filter { it.col != 0 }
         .map { materialColor ->
             MapColor.Brightness.entries.map { brightness ->
                 MapColorShade(materialColor, brightness)
