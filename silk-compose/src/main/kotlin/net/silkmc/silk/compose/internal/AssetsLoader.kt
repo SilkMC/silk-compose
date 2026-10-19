@@ -13,6 +13,7 @@ import net.silkmc.silk.core.Silk
 import net.silkmc.silk.core.logging.logError
 import net.silkmc.silk.core.logging.logInfo
 import net.silkmc.silk.core.task.silkCoroutineScope
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
 import kotlin.io.path.*
@@ -43,17 +44,19 @@ object AssetsLoader {
 
                 // extract assets
                 logInfo("Extracting assets...")
-                assetsStorage.resolve("assets").deleteRecursively()
-                Files.walk(clientFile).forEach { assetPath ->
-                    if ((assetPath.isDirectory()) || assetPath.fileName.toString().endsWith("png"))
-                        Files.copy(assetPath, assetsPath.resolve(assetPath.pathString))
-
+                assetsPath.deleteRecursively()
+                FileSystems.newFileSystem(clientFile).use { fileSystem ->
+                    Files.walk(fileSystem.getPath("assets")).use { paths ->
+                        paths.forEach { assetPath ->
+                            if (assetPath.isDirectory() || assetPath.fileName.toString().endsWith("png"))
+                                Files.copy(assetPath, assetsStorage.resolve(assetPath.pathString))
+                        }
+                    }
                 }
                 clientFile.deleteIfExists()
                 logInfo("Finished extracting assets")
 
                 // save downloaded version
-                versionFile.createFile()
                 versionFile.writeText(serverVersion)
             }
 

@@ -21,6 +21,7 @@ import org.jetbrains.skia.Pixmap
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.FrameDispatcher
 import org.jetbrains.skiko.MainUIDispatcher
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -142,11 +143,15 @@ abstract class AbstractComposeGui(
      */
     protected abstract suspend fun renderPixmap(pixmap: Pixmap)
 
+    private val closed = AtomicBoolean(false)
+
     /**
      * Safely removes this gui. This function will be called automatically
      * if the server shuts down.
      */
     fun close() {
+        // multiple failing coroutines can each trigger a close
+        if (!closed.compareAndSet(false, true)) return
         beforeClose()
 
         suspend fun actualClose() {
