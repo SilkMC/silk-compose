@@ -8,3 +8,6 @@ build/
 
 # Fabric
 run/
+
+# Paper
+run-paper/

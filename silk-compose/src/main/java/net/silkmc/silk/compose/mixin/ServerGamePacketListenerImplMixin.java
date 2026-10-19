@@ -1,7 +1,7 @@
 package net.silkmc.silk.compose.mixin;
 
 import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
-import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.network.protocol.game.ServerboundPunchPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.silkmc.silk.compose.impl.ItemFrameMapsComposeGui;
@@ -18,11 +18,11 @@ public class ServerGamePacketListenerImplMixin {
     public ServerPlayer player;
 
     @Inject(
-        method = "handleAnimate",
+        method = "handlePunch",
         at = @At("RETURN")
     )
-    private void onHandSwingInject(ServerboundSwingPacket packet, CallbackInfo ci) {
-        ItemFrameMapsComposeGui.PlayerHolder.onSwingHand(player, packet);
+    private void onHandSwingInject(ServerboundPunchPacket packet, CallbackInfo ci) {
+        ItemFrameMapsComposeGui.PlayerHolder.onSwingHand(player);
     }
 
     @Inject(
@@ -36,7 +36,7 @@ public class ServerGamePacketListenerImplMixin {
         cancellable = true
     )
     private void onUpdateSelectedSlotInject(ServerboundSetCarriedItemPacket packet, CallbackInfo ci) {
-        if (ItemFrameMapsComposeGui.PlayerHolder.onUpdateSelectedSlot(player, packet)) {
+        if (ItemFrameMapsComposeGui.PlayerHolder.onUpdateSelectedSlot(player, packet.getSlot())) {
             ci.cancel();
         }
     }

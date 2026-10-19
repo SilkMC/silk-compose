@@ -1,0 +1,11 @@
+name: silk-compose
+version: ${version}
+main: net.silkmc.silk.compose.paper.SilkComposePaper
+description: ${description}
+api-version: '${mcVersion}'
+dependencies:
+  server:
+    silk-paper:
+      load: BEFORE
+      required: true
+      join-classpath: true

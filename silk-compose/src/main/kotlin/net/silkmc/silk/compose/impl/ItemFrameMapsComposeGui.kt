@@ -12,9 +12,9 @@ import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.TextColor
 import net.minecraft.network.protocol.game.*
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.decoration.GlowItemFrame
 import net.minecraft.world.item.Items
 import net.silkmc.silk.compose.GuiChunk
@@ -80,17 +80,15 @@ class ItemFrameMapsComposeGui(
         }
 
         @JvmStatic
-        fun onSwingHand(player: ServerPlayer, packet: ServerboundSwingPacket) {
-            if (packet.hand == InteractionHand.MAIN_HAND) {
-                playerGuis[player.uuid]?.onLeftClick()
-            }
+        fun onSwingHand(player: ServerPlayer) {
+            playerGuis[player.uuid]?.onLeftClick()
         }
 
         @JvmStatic
-        fun onUpdateSelectedSlot(player: ServerPlayer, packet: ServerboundSetCarriedItemPacket): Boolean {
+        fun onUpdateSelectedSlot(player: ServerPlayer, newSlot: Int): Boolean {
             val gui = playerGuis[player.uuid] ?: return false
 
-            val slotPair = player.inventory.selected to packet.slot
+            val slotPair = player.inventory.selectedSlot to newSlot
             val (prevSlot, newSlot) = slotPair
 
             val scrollDelta = when {
@@ -118,7 +116,8 @@ class ItemFrameMapsComposeGui(
     }
 
     private val planePoint = displayPosition.toMkArray()
-    private val planeNormal = guiDirection.normal.toMkArray()
+
+    private val planeNormal = guiDirection.unitVec3i.toMkArray()
 
     /**
      * The top left corner of the gui in the world.
@@ -187,7 +186,8 @@ class ItemFrameMapsComposeGui(
                 // spawn the fake item frame
                 val itemFrame = GlowItemFrame(player.level(), framePos, guiDirection)
                 itemFrame.isInvisible = true
-                connection.send(itemFrame.addEntityPacket)
+                val packet = ClientboundAddEntityPacket(itemFrame, itemFrame.direction.get3DDataValue(), itemFrame.pos)
+                connection.send(packet)
                 entityIds.add(itemFrame.id)
 
                 // put the map in the item frame
@@ -217,7 +217,8 @@ class ItemFrameMapsComposeGui(
                             for (y in 0 until Constants.mapPixelSize) {
                                 val bitmapColor = pixmap.getColor(
                                     x = xFrame * Constants.mapPixelSize + x,
-                                    y = yFrame * Constants.mapPixelSize + y)
+                                    y = yFrame * Constants.mapPixelSize + y
+                                )
                                 guiChunk.setColor(x, y, MapColorUtils.cachedBitmapColorToMapColor(bitmapColor))
                             }
                         }
@@ -281,8 +282,9 @@ class ItemFrameMapsComposeGui(
         val offset = calculatePlayerOffset() ?: return false
 
         // only reset the slot if the player is directly looking at the gui
-        player.connection.send(ClientboundSetCarriedItemPacket(4))
-        player.inventory.selected = 4
+
+        player.connection.send(ClientboundSetHeldSlotPacket(4))
+        player.inventory.selectedSlot = 4
 
         coroutineScope.launch {
             scene.sendPointerEvent(PointerEventType.Scroll, offset, Offset(0f, delta))
@@ -311,6 +313,7 @@ class ItemFrameMapsComposeGui(
     override fun onException(throwable: Throwable) {
         super.onException(throwable)
         player.sendText("The gui you had open has been closed due to an internal error.") {
-            color = ChatFormatting.RED.color }
+            color = TextColor.fromLegacyFormat(ChatFormatting.RED)!!.value
+        }
     }
 }

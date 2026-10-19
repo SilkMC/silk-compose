@@ -1,0 +1,15 @@
+name: silk-compose-testmod
+version: 0.0.1
+main: net.silkmc.silk.test.compose.PaperComposeTestPlugin
+description: A testmod for the Silk Compose module
+api-version: '26.3'
+dependencies:
+  server:
+    silk-paper:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    silk-compose:
+      load: BEFORE
+      required: true
+      join-classpath: true
